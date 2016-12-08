@@ -4,8 +4,6 @@
 
 ![](screen.png)
 
-![](screen_status.png)
-
 
 ## Install
 
