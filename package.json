@@ -15,6 +15,6 @@
     "hyperterm",
     "hyperterm-theme",
     "hyper-statusline",
-    "statusline",
-  ],
+    "statusline"
+  ]
 }
