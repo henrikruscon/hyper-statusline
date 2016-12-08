@@ -1,0 +1,20 @@
+{
+  "name": "hyper-statusline",
+  "version": "1.0.0",
+  "description": "Status Line Plugin for Hyper",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": "henrikdahl/hyper-statusline",
+  "author": {
+    "name": "Henrik Dahlheim",
+    "email": "henrik.dahlheim@gmail.com"
+  },
+  "keywords": [
+    "hyper",
+    "hyper-theme",
+    "hyperterm",
+    "hyperterm-theme",
+    "hyper-statusline",
+    "statusline",
+  ],
+}
