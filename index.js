@@ -84,12 +84,12 @@ exports.decorateConfig = config => {
                 -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
-            .item_hoverable:hover {
+            .item_click:hover {
                 text-decoration: underline;
                 cursor: pointer;
             }
         `
-    });
+    })
 };
 
 let curPid;
@@ -99,7 +99,7 @@ let curRemote;
 let uids = {};
 
 // Current shell cwd
-const setCwd = (pid) =>
+const setCwd = (pid) => {
     exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
         cwd = cwd.trim();
         curCwd = cwd;
@@ -107,8 +107,10 @@ const setCwd = (pid) =>
         store.dispatch({
             type: 'SESSION_SET_CWD',
             cwd
-        });
-});
+        })
+    })
+};
+
 
 // Current git branch
 const setBranch = (actionCwd) => {
@@ -122,8 +124,8 @@ const setBranch = (actionCwd) => {
 
 // Current git remote
 const setRemote = (actionCwd) => {
-    exec(`git config --get remote.origin.url | sed -e 's/.git$//'`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = /^https?:\/\//.test(remote) ? remote : '';
+    exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
+        curRemote = /^https?:\/\//.test(remote) ? remote.substring(0, remote.length-5) : '';
     })
 };
 
@@ -136,36 +138,37 @@ exports.decorateHyper = (Hyper, { React }) => {
                 folder: curCwd,
                 branch: curBranch,
                 remote: curRemote
-            };
+            }
             this.handleClick = this.handleClick.bind(this);
-        };
+        }
         handleClick(e) {
             if (e.target.classList.contains('item_folder')) {
               shell.openExternal('file://'+this.state.folder);
-            } else {
-              shell.openExternal(this.state.remote);
             }
-        };
+            else {
+               shell.openExternal(this.state.remote);
+            }
+        }
         render() {
             const hasBranch = this.state.branch !== '' ? 'item_active' : '';
-            const hasRemote = this.state.remote !== '' ? 'item_hoverable' : '';
+            const hasRemote = this.state.remote !== '' ? 'item_click' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { className: 'item_item item_folder item_active item_hoverable', onClick: this.handleClick }, this.state.folder),
+                        React.createElement('div', { className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
                         React.createElement('div', { className: `item_item item_branch ${hasBranch} ${hasRemote}`, onClick: this.handleClick },  this.state.branch)
                     )
                 }))
-            );
-        };
+            )
+        }
         componentDidMount() {
             setInterval(() => this.setState({
                 folder: curCwd,
                 branch: curBranch,
                 remote: curRemote
-            }), 100);
-        };
+            }), 100)
+        }
     };
 };
 
