@@ -63,6 +63,7 @@ exports.decorateConfig = config => {
             .item_active::before {
                 content: '';
                 position: absolute;
+                top: 0;
                 left: 0;
                 width: 14px;
                 height: 100%;
@@ -84,6 +85,22 @@ exports.decorateConfig = config => {
                 -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
+            .item_dirty {
+                padding-right: 21px;
+            }
+            .item_dirty::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 14px;
+                height: 100%;
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: right center;
+                -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
+                -webkit-mask-size: 12px 12px;
+                background-color: #FFB68E;
+            }
             .item_click:hover {
                 text-decoration: underline;
                 cursor: pointer;
@@ -96,6 +113,7 @@ let curPid;
 let curCwd;
 let curBranch;
 let curRemote;
+let repoDirty;
 let uids = {};
 
 // Current shell cwd
@@ -111,13 +129,13 @@ const setCwd = (pid) => {
     })
 };
 
-
 // Current git branch
 const setBranch = (actionCwd) => {
     exec(`git symbolic-ref --short HEAD`, { cwd: actionCwd }, (err, branch) => {
         curBranch = branch;
+
         if (branch !== '') {
-          setRemote(actionCwd);
+            setRemote(actionCwd);
         }
     })
 };
@@ -125,7 +143,14 @@ const setBranch = (actionCwd) => {
 // Current git remote
 const setRemote = (actionCwd) => {
     exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = /^https?:\/\//.test(remote) ? remote.replace(/[A-z0-9\-]+@/, '').replace(/.git$/, '') : '';
+        curRemote = /^https?:\/\//.test(remote) ? remote.replace(/[A-z0-9\-]+@/, '').replace(/\.git/, '') : '';
+    })
+};
+
+// Check if repo is dirty
+const checkDirty = (actionCwd) => {
+    exec(`git status --porcelain --ignore-submodules -unormal`, { cwd: actionCwd }, (err, dirty) => {
+        repoDirty = dirty;
     })
 };
 
@@ -137,27 +162,29 @@ exports.decorateHyper = (Hyper, { React }) => {
             this.state = {
                 folder: curCwd,
                 branch: curBranch,
-                remote: curRemote
+                remote: curRemote,
+                dirty: repoDirty,
             }
             this.handleClick = this.handleClick.bind(this);
         }
         handleClick(e) {
             if (e.target.classList.contains('item_folder')) {
-              shell.openExternal('file://'+this.state.folder);
+                shell.openExternal('file://'+this.state.folder);
             }
             else {
-               shell.openExternal(this.state.remote);
+                shell.openExternal(this.state.remote);
             }
         }
         render() {
             const hasBranch = this.state.branch !== '' ? 'item_active' : '';
             const hasRemote = this.state.remote !== '' ? 'item_click' : '';
+            const isDirty = this.state.dirty !== '' ? 'item_dirty' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
-                        React.createElement('div', { className: `item_item item_branch ${hasBranch} ${hasRemote}`, onClick: this.handleClick },  this.state.branch)
+                        React.createElement('div', { className: `item_item item_branch ${hasBranch} ${hasRemote} ${isDirty}`, onClick: this.handleClick },  this.state.branch)
                     )
                 }))
             )
@@ -166,7 +193,8 @@ exports.decorateHyper = (Hyper, { React }) => {
             setInterval(() => this.setState({
                 folder: curCwd,
                 branch: curBranch,
-                remote: curRemote
+                remote: curRemote,
+                dirty: repoDirty,
             }), 100)
         }
     };
@@ -185,6 +213,7 @@ exports.middleware = (store) => (next) => (action) => {
             break;
         case 'SESSION_SET_CWD':
             setBranch(curCwd);
+            checkDirty(curCwd);
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid];
