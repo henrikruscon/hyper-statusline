@@ -125,7 +125,7 @@ const setBranch = (actionCwd) => {
 // Current git remote
 const setRemote = (actionCwd) => {
     exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = /^https?:\/\//.test(remote) ? remote.substring(0, remote.length-5) : '';
+        curRemote = /^https?:\/\//.test(remote) ? remote.replace(/[A-z0-9\-]+@/, '').replace(/.git$/, '') : '';
     })
 };
 
