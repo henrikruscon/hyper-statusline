@@ -56,10 +56,6 @@ exports.decorateConfig = config => {
                 opacity: 0;
                 pointer-events: none;
             }
-            .item_item:hover {
-                text-decoration: underline;
-                cursor: pointer;
-            }
             .item_active {
                 opacity: 0.7;
                 pointer-events: auto;
@@ -87,6 +83,10 @@ exports.decorateConfig = config => {
             .item_branch::before {
                 -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
+            }
+            .item_hoverable:hover {
+                text-decoration: underline;
+                cursor: pointer;
             }
         `
     });
@@ -123,7 +123,7 @@ const setBranch = (actionCwd) => {
 // Current git remote
 const setRemote = (actionCwd) => {
     exec(`git config --get remote.origin.url | sed -e 's/.git$//'`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = remote;
+        curRemote = /^https?:\/\//.test(remote) ? remote : '';
     })
 };
 
@@ -148,12 +148,13 @@ exports.decorateHyper = (Hyper, { React }) => {
         };
         render() {
             const hasBranch = this.state.branch !== '' ? 'item_active' : '';
+            const hasRemote = this.state.remote !== '' ? 'item_hoverable' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { className: 'item_item item_folder item_active', onClick: this.handleClick }, this.state.folder),
-                        React.createElement('div', { className: `item_item item_branch ${hasBranch}`, onClick: this.handleClick },  this.state.branch)
+                        React.createElement('div', { className: 'item_item item_folder item_active item_hoverable', onClick: this.handleClick }, this.state.folder),
+                        React.createElement('div', { className: `item_item item_branch ${hasBranch} ${hasRemote}`, onClick: this.handleClick },  this.state.branch)
                     )
                 }))
             );
