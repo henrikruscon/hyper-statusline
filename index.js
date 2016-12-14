@@ -89,7 +89,6 @@ exports.decorateConfig = config => {
                 padding-right: 21px;
             }
             .item_dirty::after {
-                opacity: 1;
                 content: '';
                 position: absolute;
                 top: 0;
