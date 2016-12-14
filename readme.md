@@ -1,6 +1,6 @@
 # hyper-statusline [![npm](https://img.shields.io/npm/v/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline) [![npm](https://img.shields.io/npm/dt/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline)
 
-> Status Line Plugin for [Hyper](https://hyper.is)
+> Statusline Plugin for [Hyper](https://hyper.is). Shows useful information. Matches any theme.
 
 ![](screen.png)
 
