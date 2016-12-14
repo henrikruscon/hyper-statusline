@@ -48,11 +48,9 @@ exports.decorateConfig = config => {
                 display: flex;
                 align-items: center;
                 color: ${config.foregroundColor || 'white'};
+                white-space: nowrap;
                 background-repeat: no-repeat;
                 background-position: left center;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
                 opacity: 0;
                 pointer-events: none;
             }
@@ -72,16 +70,21 @@ exports.decorateConfig = config => {
                 background-color: ${config.foregroundColor || 'white'};
             }
             .item_folder {
+                display: inline-block;
+                text-overflow: ellipsis;
+                line-height: 30px;
                 padding-left: 21px;
+                overflow: hidden;
             }
             .item_folder::before {
                 -webkit-mask-image: url('${__dirname}/icons/folder.svg');
                 -webkit-mask-size: 14px 12px;
             }
             .item_branch {
-                padding-left: 16px;
+                padding-left: 30px;
             }
             .item_branch::before {
+                left: 14.5px;
                 -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
@@ -95,11 +98,11 @@ exports.decorateConfig = config => {
                 right: 0;
                 width: 14px;
                 height: 100%;
-                -webkit-mask-repeat: no-repeat;
-                -webkit-mask-position: right center;
                 -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
                 background-color: ${config.colors.orange || config.colors.yellow};
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: right center;
             }
             .item_click:hover {
                 text-decoration: underline;
@@ -154,6 +157,15 @@ const checkDirty = (actionCwd) => {
     })
 };
 
+// Check arrow status
+// const checkStatus = (actionCwd) => {
+//     exec(`git rev-list --left-right --count HEAD...@'{u}'`, { cwd: actionCwd }, (err, commits) => {
+//         commits = commits.split("\t");
+//         pushArrow = commits[0] > 0 ? commits[0] : '';
+//         pullArrow = commits[1] > 0 ? commits[1] : '';
+//     })
+// };
+
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.Component {
@@ -176,15 +188,15 @@ exports.decorateHyper = (Hyper, { React }) => {
             }
         }
         render() {
-            const hasBranch = this.state.branch !== '' ? 'item_active' : '';
-            const hasRemote = this.state.remote !== '' ? 'item_click' : '';
-            const isDirty = this.state.dirty !== '' ? 'item_dirty' : '';
+            const hasBranch = this.state.branch !== '' ? ' item_active' : '';
+            const hasRemote = this.state.remote !== '' ? ' item_click' : '';
+            const isDirty = this.state.dirty !== '' ? ' item_dirty' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
-                        React.createElement('div', { className: `item_item item_branch ${hasBranch} ${hasRemote} ${isDirty}`, onClick: this.handleClick },  this.state.branch)
+                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
+                        React.createElement('div', { className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick },  this.state.branch)
                     )
                 }))
             )
