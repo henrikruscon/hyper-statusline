@@ -89,6 +89,7 @@ exports.decorateConfig = config => {
                 padding-right: 21px;
             }
             .item_dirty::after {
+                opacity: 1;
                 content: '';
                 position: absolute;
                 top: 0;
@@ -99,7 +100,7 @@ exports.decorateConfig = config => {
                 -webkit-mask-position: right center;
                 -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
-                background-color: #FFB68E;
+                background-color: ${config.colors.orange || config.colors.yellow};
             }
             .item_click:hover {
                 text-decoration: underline;
