@@ -77,7 +77,7 @@ exports.decorateConfig = config => {
                 overflow: hidden;
             }
             .item_folder::before {
-                -webkit-mask-image: url('${__dirname}/icons/folder.svg');
+                -webkit-mask-image: url('./icons/folder.svg');
                 -webkit-mask-size: 14px 12px;
             }
             .item_branch {
@@ -85,7 +85,7 @@ exports.decorateConfig = config => {
             }
             .item_branch::before {
                 left: 14.5px;
-                -webkit-mask-image: url('${__dirname}/icons/branch.svg');
+                -webkit-mask-image: url('./icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
             .item_dirty {
@@ -98,7 +98,7 @@ exports.decorateConfig = config => {
                 right: 0;
                 width: 14px;
                 height: 100%;
-                -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
+                -webkit-mask-image: url('./icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
                 background-color: ${config.colors.orange || config.colors.yellow};
                 -webkit-mask-repeat: no-repeat;
@@ -120,15 +120,14 @@ let repoDirty;
 let uids = {};
 
 // Current shell cwd
-const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
-        cwd = cwd.trim();
-        curCwd = cwd;
+const setCwd = (cwd) => {
+    if (!/^~/.test(cwd)) return false;
 
-        store.dispatch({
-            type: 'SESSION_SET_CWD',
-            cwd
-        })
+    curCwd = process.env.HOME+cwd.substring(1);
+
+    store.dispatch({
+        type: 'SESSION_SET_CWD',
+        cwd: curCwd,
     })
 };
 
@@ -201,7 +200,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                     remote: curRemote,
                     dirty: repoDirty,
                 })
-            }, 200)
+            }, 150)
         }
         componentWillUnmount() {
             clearInterval(this.interval)
@@ -213,19 +212,20 @@ exports.decorateHyper = (Hyper, { React }) => {
 exports.middleware = (store) => (next) => (action) => {
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            if (curPid && uids[action.uid] === curPid) setCwd(curPid);
+            if (/^~/.test(action.title)) uids[action.uid] = action.title;
+            curTitle = uids[action.uid];
+            setCwd(curTitle);
             break;
         case 'SESSION_ADD':
-            uids[action.uid] = action.pid;
-            curPid = action.pid;
-            setCwd(curPid);
+            curTitle = uids[action.uid];
+            setCwd(curTitle);
             break;
         case 'SESSION_SET_CWD':
             setBranch(curCwd);
             break;
         case 'SESSION_SET_ACTIVE':
-            curPid = uids[action.uid];
-            setCwd(curPid);
+            curTitle = uids[action.uid];
+            setCwd(curTitle);
             break;
         case 'SESSION_PTY_EXIT':
             delete uids[action.uid];
