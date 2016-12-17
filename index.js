@@ -77,7 +77,7 @@ exports.decorateConfig = config => {
                 overflow: hidden;
             }
             .item_folder::before {
-                -webkit-mask-image: url('./icons/folder.svg');
+                -webkit-mask-image: url('${__dirname}/icons/folder.svg');
                 -webkit-mask-size: 14px 12px;
             }
             .item_branch {
@@ -85,7 +85,7 @@ exports.decorateConfig = config => {
             }
             .item_branch::before {
                 left: 14.5px;
-                -webkit-mask-image: url('./icons/branch.svg');
+                -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
             .item_dirty {
@@ -98,7 +98,7 @@ exports.decorateConfig = config => {
                 right: 0;
                 width: 14px;
                 height: 100%;
-                -webkit-mask-image: url('./icons/dirty.svg');
+                -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
                 background-color: ${config.colors.orange || config.colors.yellow};
                 -webkit-mask-repeat: no-repeat;
