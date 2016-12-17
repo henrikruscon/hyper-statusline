@@ -139,6 +139,7 @@ const setBranch = (actionCwd) => {
 
         if (branch !== '') {
             setRemote(actionCwd);
+            checkDirty(curCwd);
         }
     })
 };
@@ -156,15 +157,6 @@ const checkDirty = (actionCwd) => {
         repoDirty = dirty;
     })
 };
-
-// Check arrow status
-// const checkStatus = (actionCwd) => {
-//     exec(`git rev-list --left-right --count HEAD...@'{u}'`, { cwd: actionCwd }, (err, commits) => {
-//         commits = commits.split("\t");
-//         pushArrow = commits[0] > 0 ? commits[0] : '';
-//         pullArrow = commits[1] > 0 ? commits[1] : '';
-//     })
-// };
 
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
@@ -202,12 +194,17 @@ exports.decorateHyper = (Hyper, { React }) => {
             )
         }
         componentDidMount() {
-            setInterval(() => this.setState({
-                folder: curCwd,
-                branch: curBranch,
-                remote: curRemote,
-                dirty: repoDirty,
-            }), 100)
+            this.interval = setInterval(() => {
+                this.setState({
+                    folder: curCwd,
+                    branch: curBranch,
+                    remote: curRemote,
+                    dirty: repoDirty,
+                })
+            }, 200)
+        }
+        componentWillUnmount() {
+            clearInterval(this.interval)
         }
     };
 };
@@ -215,7 +212,7 @@ exports.decorateHyper = (Hyper, { React }) => {
 // Sessions
 exports.middleware = (store) => (next) => (action) => {
     switch (action.type) {
-        case 'SESSION_PTY_DATA':
+        case 'SESSION_SET_XTERM_TITLE':
             if (curPid && uids[action.uid] === curPid) setCwd(curPid);
             break;
         case 'SESSION_ADD':
@@ -225,7 +222,6 @@ exports.middleware = (store) => (next) => (action) => {
             break;
         case 'SESSION_SET_CWD':
             setBranch(curCwd);
-            checkDirty(curCwd);
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid];
