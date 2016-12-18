@@ -120,14 +120,15 @@ let repoDirty;
 let uids = {};
 
 // Current shell cwd
-const setCwd = (cwd) => {
-    if (!/^~/.test(cwd)) return false;
+const setCwd = (pid) => {
+    exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
+        cwd = cwd.trim();
+        curCwd = cwd;
 
-    curCwd = process.env.HOME+cwd.substring(1);
-
-    store.dispatch({
-        type: 'SESSION_SET_CWD',
-        cwd: curCwd,
+        store.dispatch({
+            type: 'SESSION_SET_CWD',
+            cwd
+        })
     })
 };
 
@@ -200,7 +201,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                     remote: curRemote,
                     dirty: repoDirty,
                 })
-            }, 150)
+            }, 200)
         }
         componentWillUnmount() {
             clearInterval(this.interval)
@@ -212,20 +213,19 @@ exports.decorateHyper = (Hyper, { React }) => {
 exports.middleware = (store) => (next) => (action) => {
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            if (/^~/.test(action.title)) uids[action.uid] = action.title;
-            curTitle = uids[action.uid];
-            setCwd(curTitle);
+            if (curPid && uids[action.uid] === curPid) setCwd(curPid);
             break;
         case 'SESSION_ADD':
-            curTitle = uids[action.uid];
-            setCwd(curTitle);
+            uids[action.uid] = action.pid;
+            curPid = action.pid;
+            setCwd(curPid);
             break;
         case 'SESSION_SET_CWD':
             setBranch(curCwd);
             break;
         case 'SESSION_SET_ACTIVE':
-            curTitle = uids[action.uid];
-            setCwd(curTitle);
+            curPid = uids[action.uid];
+            setCwd(curPid);
             break;
         case 'SESSION_PTY_EXIT':
             delete uids[action.uid];
