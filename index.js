@@ -122,13 +122,9 @@ let uids = {};
 // Current shell cwd
 const setCwd = (pid) => {
     exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
-        cwd = cwd.trim();
-        curCwd = cwd;
+        curCwd = cwd.trim();
 
-        store.dispatch({
-            type: 'SESSION_SET_CWD',
-            cwd
-        })
+        setBranch(curCwd);
     })
 };
 
@@ -201,7 +197,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                     remote: curRemote,
                     dirty: repoDirty,
                 })
-            }, 200)
+            }, 150)
         }
         componentWillUnmount() {
             clearInterval(this.interval)
@@ -219,9 +215,6 @@ exports.middleware = (store) => (next) => (action) => {
             uids[action.uid] = action.pid;
             curPid = action.pid;
             setCwd(curPid);
-            break;
-        case 'SESSION_SET_CWD':
-            setBranch(curCwd);
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid];
