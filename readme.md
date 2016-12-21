@@ -23,6 +23,7 @@ module.exports = {
 Add following to `~/.hyper.js`.
 
 ### Disable Footer Transparency
+Default value is set to `false`
 
 ```javascript
 module.exports = {
@@ -37,6 +38,7 @@ module.exports = {
 ```
 
 ### Change Git Dirty Color
+Expected value is `CSS colors`
 
 ```javascript
 module.exports = {
