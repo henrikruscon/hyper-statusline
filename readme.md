@@ -7,7 +7,48 @@
 
 ## Install
 
-Add `hyper-statusline` after your theme to the plugins array in your `~/.hyper.js` config file and full reload.
+Add following to the plugins array in your `~/.hyper.js` config.
+
+```javascript
+module.exports = {
+  ...
+  plugins: ['hyper-statusline']
+  ...
+}
+```
+
+
+## Config
+
+Add following to `~/.hyper.js`.
+
+### Disable Footer Transparency
+
+```javascript
+module.exports = {
+  config: {
+    ...
+      hyperStatusLine: {
+        footerTransparent: true,
+      }
+    ...
+  }
+}
+```
+
+### Change Git Dirty Color
+
+```javascript
+module.exports = {
+  config: {
+    ...
+      hyperStatusLine: {
+        dirtyColor: 'pink'
+      }
+    ...
+  }
+}
+```
 
 
 ## Theme

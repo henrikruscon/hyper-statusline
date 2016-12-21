@@ -4,6 +4,11 @@ const { exec } = require('child_process');
 
 // Config
 exports.decorateConfig = config => {
+    var configObj = Object.assign({
+        footerTransparent: true,
+        dirtyColor: config.colors.orange || config.colors.yellow,
+    }, config.hyperStatusLine);
+
     return Object.assign({}, config, {
         css: `
             ${config.css || ''}
@@ -22,7 +27,7 @@ exports.decorateConfig = config => {
                 font-size: 12px;
                 height: 30px;
                 padding: 0 14px 1px;
-                opacity: 0.45;
+                opacity: ${configObj.footerTransparent ? '0.5' : '1'};
                 cursor: default;
                 -webkit-user-select: none;
                 transition: opacity 250ms ease;
@@ -100,7 +105,7 @@ exports.decorateConfig = config => {
                 height: 100%;
                 -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
-                background-color: ${config.colors.orange || config.colors.yellow};
+                background-color: ${configObj.dirtyColor};
                 -webkit-mask-repeat: no-repeat;
                 -webkit-mask-position: right center;
             }
