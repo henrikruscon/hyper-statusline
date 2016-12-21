@@ -43,7 +43,7 @@ module.exports = {
   config: {
     ...
       hyperStatusLine: {
-        dirtyColor: 'pink'
+        dirtyColor: 'pink',
       }
     ...
   }
