@@ -35,7 +35,7 @@ exports.decorateConfig = config => {
             .footer_footer:hover {
                 opacity: 1;
             }
-            .footer_footer::before {
+            .footer_footer:before {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -63,7 +63,7 @@ exports.decorateConfig = config => {
                 opacity: 0.7;
                 pointer-events: auto;
             }
-            .item_active::before {
+            .item_active:before {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -81,14 +81,14 @@ exports.decorateConfig = config => {
                 padding-left: 21px;
                 overflow: hidden;
             }
-            .item_folder::before {
+            .item_folder:before {
                 -webkit-mask-image: url('${__dirname}/icons/folder.svg');
                 -webkit-mask-size: 14px 12px;
             }
             .item_branch {
                 padding-left: 30px;
             }
-            .item_branch::before {
+            .item_branch:before {
                 left: 14.5px;
                 -webkit-mask-image: url('${__dirname}/icons/branch.svg');
                 -webkit-mask-size: 9px 12px;
@@ -96,7 +96,7 @@ exports.decorateConfig = config => {
             .item_dirty {
                 padding-right: 21px;
             }
-            .item_dirty::after {
+            .item_dirty:after {
                 content: '';
                 position: absolute;
                 top: 0;
@@ -189,7 +189,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
-                        React.createElement('div', { className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick },  this.state.branch)
+                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick },  this.state.branch)
                     )
                 }))
             )
