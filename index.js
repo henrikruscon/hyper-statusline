@@ -128,7 +128,6 @@ let uids = {};
 const setCwd = (pid) => {
     exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
         curCwd = cwd.trim();
-
         setBranch(curCwd);
     })
 };
@@ -220,6 +219,12 @@ exports.middleware = (store) => (next) => (action) => {
             uids[action.uid] = action.pid;
             curPid = action.pid;
             setCwd(curPid);
+            break;
+        case 'SESSION_ADD_DATA':
+            const { data } = action;
+            if (data.charCodeAt(0) === 13) {
+                setCwd(curPid)
+            }
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid];
