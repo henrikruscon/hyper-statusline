@@ -23,14 +23,14 @@ module.exports = {
 Add following to `~/.hyper.js`.
 
 ### Disable Footer Transparency
-Default value is set to `false`
+Default value is set to `true`
 
 ```javascript
 module.exports = {
   config: {
     ...
       hyperStatusLine: {
-        footerTransparent: true,
+        footerTransparent: false,
       }
     ...
   }
