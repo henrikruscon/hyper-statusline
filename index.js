@@ -5,7 +5,7 @@ const { exec } = require('child_process');
 // Config
 exports.decorateConfig = config => {
     var configObj = Object.assign({
-        footerTransparent: true,
+        footerTransparent: false,
         dirtyColor: config.colors.orange || config.colors.yellow,
     }, config.hyperStatusLine);
 
