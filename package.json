@@ -16,5 +16,8 @@
     "hyperterm-theme",
     "hyper-statusline",
     "statusline"
-  ]
+  ],
+  "dependencies": {
+    "tildify": "^1.2.0"
+  }
 }
