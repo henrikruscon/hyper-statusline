@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 const tildify = require('tildify');
 
 // Config
-exports.decorateConfig = config => {
+exports.decorateConfig = (config) => {
     var hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: config.colors.orange || config.colors.yellow,
@@ -188,7 +188,7 @@ exports.decorateHyper = (Hyper, { React }) => {
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, tildify(String(this.state.folder))),
+                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick }, this.state.branch)
                     )
                 }))
@@ -202,7 +202,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                     remote: curRemote,
                     dirty: repoDirty,
                 })
-            }, 150)
+            }, 100)
         }
         componentWillUnmount() {
             clearInterval(this.interval)
