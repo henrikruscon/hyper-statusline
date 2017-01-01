@@ -91,28 +91,28 @@ exports.decorateConfig = (config) => {
             }
             .item_branch:before {
                 left: 14.5px;
-                -webkit-mask-image: url('${__dirname}/icons/branch.svg');
+                -webkit-mask-image: url('${__dirname}/icons/git-branch.svg');
                 -webkit-mask-size: 9px 12px;
-            }
-            .item_dirty {
-                padding-right: 21px;
-            }
-            .item_dirty:after {
-                content: '';
-                position: absolute;
-                top: 0;
-                right: 0;
-                width: 14px;
-                height: 100%;
-                -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
-                -webkit-mask-size: 12px 12px;
-                background-color: ${hyperStatusLine.dirtyColor};
-                -webkit-mask-repeat: no-repeat;
-                -webkit-mask-position: right center;
             }
             .item_click:hover {
                 text-decoration: underline;
                 cursor: pointer;
+            }
+            .item_icon {
+                display: none;
+                width: 14px;
+                height: 100%;
+                margin-left: 7px;
+                -webkit-mask-size: 12px 12px;
+                -webkit-mask-repeat: no-repeat;
+                -webkit-mask-position: right center;
+            }
+            .icon_active {
+                display: inline-block;
+            }
+            .icon_dirty {
+                -webkit-mask-image: url('${__dirname}/icons/git-dirty.svg');
+                background-color: ${hyperStatusLine.dirtyColor};
             }
         `
     })
@@ -183,13 +183,16 @@ exports.decorateHyper = (Hyper, { React }) => {
         render() {
             const hasBranch = this.state.branch !== '' ? ' item_active' : '';
             const hasRemote = this.state.remote !== '' ? ' item_click' : '';
-            const isDirty = this.state.dirty !== '' ? ' item_dirty' : '';
+            const isDirty = this.state.dirty !== '' ? ' icon_active' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
-                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick }, this.state.branch)
+                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
+                            React.createElement('span', { className: 'item_text' }, this.state.branch),
+                            React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` })
+                        )
                     )
                 }))
             )
