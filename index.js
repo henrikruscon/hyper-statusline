@@ -7,7 +7,7 @@ const tildify = require('tildify');
 exports.decorateConfig = (config) => {
     var hyperStatusLine = Object.assign({
         footerTransparent: true,
-        dirtyColor: config.colors.orange || config.colors.yellow,
+        dirtyColor: config.colors.yellow,
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
