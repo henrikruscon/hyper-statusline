@@ -7,7 +7,7 @@
 
 ## Install
 
-Add following to the plugins array in your `~/.hyper.js` config.
+Add following to your `~/.hyper.js` config.
 
 ```javascript
 module.exports = {
@@ -60,4 +60,4 @@ module.exports = {
 
 ## License
 
-MIT © Henrik Dahlheim
+MIT © Henrik
