@@ -123,7 +123,6 @@ let curCwd;
 let curBranch;
 let curRemote;
 let repoDirty;
-let uids = {};
 
 // Current shell cwd
 const setCwd = (pid) => {
@@ -215,12 +214,13 @@ exports.decorateHyper = (Hyper, { React }) => {
 
 // Sessions
 exports.middleware = (store) => (next) => (action) => {
+    const uids = store.getState().sessions.sessions;
+    
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            if (curPid && uids[action.uid] === curPid) setCwd(curPid);
+            if (curPid && uids[action.uid].pid === curPid) setCwd(curPid);
             break;
         case 'SESSION_ADD':
-            uids[action.uid] = action.pid;
             curPid = action.pid;
             setCwd(curPid);
             break;
@@ -229,14 +229,8 @@ exports.middleware = (store) => (next) => (action) => {
             if (data.charCodeAt(0) === 13) setCwd(curPid);
             break;
         case 'SESSION_SET_ACTIVE':
-            curPid = uids[action.uid];
+            curPid = uids[action.uid].pid;
             setCwd(curPid);
-            break;
-        case 'SESSION_PTY_EXIT':
-            delete uids[action.uid];
-            break;
-        case 'SESSION_USER_EXIT':
-            delete uids[action.uid];
             break;
     }
     next(action);
