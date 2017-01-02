@@ -100,12 +100,12 @@ exports.decorateConfig = (config) => {
             }
             .item_icon {
                 display: none;
-                width: 14px;
+                width: 12px;
                 height: 100%;
-                margin-left: 7px;
+                margin-left: 9px;
                 -webkit-mask-size: 12px 12px;
                 -webkit-mask-repeat: no-repeat;
-                -webkit-mask-position: right center;
+                -webkit-mask-position: 0 center;
             }
             .icon_active {
                 display: inline-block;
@@ -180,14 +180,15 @@ exports.decorateHyper = (Hyper, { React }) => {
             }
         }
         render() {
-            const hasBranch = this.state.branch !== '' ? ' item_active' : '';
-            const hasRemote = this.state.remote !== '' ? ' item_click' : '';
-            const isDirty = this.state.dirty !== '' ? ' icon_active' : '';
+            const hasFolder = this.state.folder ? ' item_active item_click' : '';
+            const hasBranch = this.state.branch ? ' item_active' : '';
+            const hasRemote = this.state.remote ? ' item_click' : '';
+            const isDirty = this.state.dirty ? ' icon_active' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
+                        React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
                             React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` })
@@ -215,10 +216,10 @@ exports.decorateHyper = (Hyper, { React }) => {
 // Sessions
 exports.middleware = (store) => (next) => (action) => {
     const uids = store.getState().sessions.sessions;
-    
+
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            if (curPid && uids[action.uid].pid === curPid) setCwd(curPid);
+            curPid = uids[action.uid].pid;
             break;
         case 'SESSION_ADD':
             curPid = action.pid;
