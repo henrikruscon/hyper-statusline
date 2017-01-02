@@ -1,10 +1,11 @@
 // Require
 const { shell } = require('electron');
 const { exec } = require('child_process');
+const tildify = require('tildify');
 
 // Config
 exports.decorateConfig = config => {
-    var configObj = Object.assign({
+    var hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: config.colors.orange || config.colors.yellow,
     }, config.hyperStatusLine);
@@ -27,7 +28,7 @@ exports.decorateConfig = config => {
                 font-size: 12px;
                 height: 30px;
                 padding: 0 14px 1px;
-                opacity: ${configObj.footerTransparent ? '0.5' : '1'};
+                opacity: ${hyperStatusLine.footerTransparent ? '0.5' : '1'};
                 cursor: default;
                 -webkit-user-select: none;
                 transition: opacity 250ms ease;
@@ -105,7 +106,7 @@ exports.decorateConfig = config => {
                 height: 100%;
                 -webkit-mask-image: url('${__dirname}/icons/dirty.svg');
                 -webkit-mask-size: 12px 12px;
-                background-color: ${configObj.dirtyColor};
+                background-color: ${hyperStatusLine.dirtyColor};
                 -webkit-mask-repeat: no-repeat;
                 -webkit-mask-position: right center;
             }
@@ -139,7 +140,7 @@ const setBranch = (actionCwd) => {
 
         if (branch !== '') {
             setRemote(actionCwd);
-            checkDirty(curCwd);
+            checkDirty(actionCwd);
         }
     })
 };
@@ -187,8 +188,8 @@ exports.decorateHyper = (Hyper, { React }) => {
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, this.state.folder),
-                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick },  this.state.branch)
+                        React.createElement('div', { title: this.state.folder, className: 'item_item item_folder item_active item_click', onClick: this.handleClick }, tildify(String(this.state.folder))),
+                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}${isDirty}`, onClick: this.handleClick }, this.state.branch)
                     )
                 }))
             )
@@ -222,9 +223,7 @@ exports.middleware = (store) => (next) => (action) => {
             break;
         case 'SESSION_ADD_DATA':
             const { data } = action;
-            if (data.charCodeAt(0) === 13) {
-                setCwd(curPid)
-            }
+            if (data.charCodeAt(0) === 13) setCwd(curPid);
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid];
