@@ -45,7 +45,22 @@ module.exports = {
   config: {
     ...
       hyperStatusLine: {
-        dirtyColor: 'pink',
+        dirtyColor: 'salmon',
+      }
+    ...
+  }
+}
+```
+
+### Change Git Arrows Color
+Expected value is `CSS colors`
+
+```javascript
+module.exports = {
+  config: {
+    ...
+      hyperStatusLine: {
+        arrowsColor: 'ivory',
       }
     ...
   }
@@ -55,7 +70,7 @@ module.exports = {
 
 ## Theme
 
-* [hyperterm-chesterish](https://github.com/henrikdahl/hyperterm-chesterish)
+* [hyper-chesterish](https://github.com/henrikdahl/hyper-chesterish)
 
 
 ## License

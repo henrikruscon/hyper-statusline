@@ -5,9 +5,10 @@ const tildify = require('tildify');
 
 // Config
 exports.decorateConfig = (config) => {
-    var hyperStatusLine = Object.assign({
+    const hyperStatusLine = Object.assign({
         footerTransparent: true,
-        dirtyColor: config.colors.yellow,
+        dirtyColor: config.colors.lightYellow,
+        arrowsColor: config.colors.cyan,
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -114,6 +115,14 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-image: url('${__dirname}/icons/git-dirty.svg');
                 background-color: ${hyperStatusLine.dirtyColor};
             }
+            .icon_push, .icon_pull {
+                -webkit-mask-image: url('${__dirname}/icons/git-arrow.svg');
+                background-color: ${hyperStatusLine.arrowsColor};
+            }
+            .icon_pull {
+                transform: scaleY(-1);
+                -webkit-mask-position: 0 8px;
+            }
         `
     })
 };
@@ -123,6 +132,8 @@ let curCwd;
 let curBranch;
 let curRemote;
 let repoDirty;
+let pushArrow;
+let pullArrow;
 
 // Current shell cwd
 const setCwd = (pid) => {
@@ -140,6 +151,7 @@ const setBranch = (actionCwd) => {
         if (branch !== '') {
             setRemote(actionCwd);
             checkDirty(actionCwd);
+            checkArrows(actionCwd);
         }
     })
 };
@@ -158,6 +170,15 @@ const checkDirty = (actionCwd) => {
     })
 };
 
+// Check git left & right arrows status
+const checkArrows = (actionCwd) => {
+    exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: actionCwd }, (err, arrows) => {
+        arrows = arrows.split("\t");
+        pushArrow = arrows[0] > 0 ? arrows[0] : '';
+        pullArrow = arrows[1] > 0 ? arrows[1] : '';
+    })
+};
+
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.Component {
@@ -168,22 +189,22 @@ exports.decorateHyper = (Hyper, { React }) => {
                 branch: curBranch,
                 remote: curRemote,
                 dirty: repoDirty,
+                push: pushArrow,
+                pull: pullArrow,
             }
             this.handleClick = this.handleClick.bind(this);
         }
         handleClick(e) {
-            if (e.target.classList.contains('item_folder')) {
-                shell.openExternal('file://'+this.state.folder);
-            }
-            else {
-                shell.openExternal(this.state.remote);
-            }
+            if (e.target.classList.contains('item_folder')) shell.openExternal('file://'+this.state.folder);
+            else shell.openExternal(this.state.remote);
         }
         render() {
             const hasFolder = this.state.folder ? ' item_active item_click' : '';
             const hasBranch = this.state.branch ? ' item_active' : '';
             const hasRemote = this.state.remote ? ' item_click' : '';
             const isDirty = this.state.dirty ? ' icon_active' : '';
+            const hasPush = this.state.push ? ' icon_active' : '';
+            const hasPull = this.state.pull ? ' icon_active' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
@@ -191,7 +212,9 @@ exports.decorateHyper = (Hyper, { React }) => {
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
-                            React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` })
+                            React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` }),
+                            React.createElement('i', { title: 'git-push', className: `item_icon icon_push${hasPush}` }),
+                            React.createElement('i', { title: 'git-pull', className: `item_icon icon_pull${hasPull}` })
                         )
                     )
                 }))
@@ -204,6 +227,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                     branch: curBranch,
                     remote: curRemote,
                     dirty: repoDirty,
+                    push: pushArrow,
+                    pull: pullArrow,
                 })
             }, 100)
         }
