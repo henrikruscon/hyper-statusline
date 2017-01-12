@@ -5,6 +5,7 @@ const tildify = require('tildify');
 
 // Config
 exports.decorateConfig = (config) => {
+    const dirname = process.platform === 'win32' ? __dirname.replace(/\\/gi, '/') : __dirname;
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: config.colors.lightYellow,
@@ -84,7 +85,7 @@ exports.decorateConfig = (config) => {
                 overflow: hidden;
             }
             .item_folder:before {
-                -webkit-mask-image: url('${__dirname}/icons/folder.svg');
+                -webkit-mask-image: url('${dirname}/icons/folder.svg');
                 -webkit-mask-size: 14px 12px;
             }
             .item_branch {
@@ -92,7 +93,7 @@ exports.decorateConfig = (config) => {
             }
             .item_branch:before {
                 left: 14.5px;
-                -webkit-mask-image: url('${__dirname}/icons/git-branch.svg');
+                -webkit-mask-image: url('${dirname}/icons/git-branch.svg');
                 -webkit-mask-size: 9px 12px;
             }
             .item_click:hover {
@@ -112,11 +113,11 @@ exports.decorateConfig = (config) => {
                 display: inline-block;
             }
             .icon_dirty {
-                -webkit-mask-image: url('${__dirname}/icons/git-dirty.svg');
+                -webkit-mask-image: url('${dirname}/icons/git-dirty.svg');
                 background-color: ${hyperStatusLine.dirtyColor};
             }
             .icon_push, .icon_pull {
-                -webkit-mask-image: url('${__dirname}/icons/git-arrow.svg');
+                -webkit-mask-image: url('${dirname}/icons/git-arrow.svg');
                 background-color: ${hyperStatusLine.arrowsColor};
             }
             .icon_pull {
