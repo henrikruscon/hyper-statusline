@@ -2,7 +2,7 @@
 
 > Status Line Plugin for [Hyper](https://hyper.is). Shows clickable & useful information. Matches any theme.
 
-![](screen.png)
+![hyper-statusline](https://cloud.githubusercontent.com/assets/499192/21888291/de0f6258-d8c3-11e6-9731-e36599b7c6a4.png)
 
 
 ## Install

@@ -9,6 +9,10 @@
     "name": "Henrik Dahlheim",
     "email": "henrik.dahlheim@gmail.com"
   },
+  "files": [
+    "icons",
+    "index.js"
+  ],
   "keywords": [
     "hyper",
     "hyper-theme",
