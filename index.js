@@ -8,7 +8,7 @@ exports.decorateConfig = (config) => {
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: config.colors.lightYellow,
-        arrowsColor: config.colors.cyan,
+        arrowsColor: config.colors.blue,
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {

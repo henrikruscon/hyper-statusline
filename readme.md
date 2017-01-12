@@ -2,7 +2,7 @@
 
 > Status Line Plugin for [Hyper](https://hyper.is). Shows clickable & useful information. Matches any theme.
 
-![hyper-statusline](https://cloud.githubusercontent.com/assets/499192/21888291/de0f6258-d8c3-11e6-9731-e36599b7c6a4.png)
+![hyper-statusline](https://cloud.githubusercontent.com/assets/1430576/21891665/14d29070-d8d4-11e6-9e98-b12ed28be93a.png)
 
 
 ## Install
@@ -21,21 +21,6 @@ module.exports = {
 ## Config
 
 Add following to `~/.hyper.js`.
-
-### Disable Footer Transparency
-Default value is set to `true`
-
-```javascript
-module.exports = {
-  config: {
-    ...
-      hyperStatusLine: {
-        footerTransparent: false,
-      }
-    ...
-  }
-}
-```
 
 ### Change Git Dirty Color
 Expected value is `CSS colors`
@@ -61,6 +46,21 @@ module.exports = {
     ...
       hyperStatusLine: {
         arrowsColor: 'ivory',
+      }
+    ...
+  }
+}
+```
+
+### Disable Footer Transparency
+Default value is set to `true`
+
+```javascript
+module.exports = {
+  config: {
+    ...
+      hyperStatusLine: {
+        footerTransparent: false,
       }
     ...
   }
