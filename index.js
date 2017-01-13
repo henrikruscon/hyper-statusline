@@ -10,6 +10,7 @@ exports.decorateConfig = (config) => {
         footerTransparent: true,
         dirtyColor: config.colors.lightYellow,
         arrowsColor: config.colors.blue,
+        fontSize: 12,
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -27,7 +28,7 @@ exports.decorateConfig = (config) => {
                 right: 0;
                 z-index: 100;
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-                font-size: 12px;
+                font-size: ${hyperStatusLine.fontSize}px;
                 height: 30px;
                 padding: 0 14px 1px;
                 opacity: ${hyperStatusLine.footerTransparent ? '0.5' : '1'};
@@ -80,7 +81,6 @@ exports.decorateConfig = (config) => {
             .item_folder {
                 display: inline-block;
                 text-overflow: ellipsis;
-                line-height: 30px;
                 padding-left: 21px;
                 overflow: hidden;
             }
@@ -99,6 +99,12 @@ exports.decorateConfig = (config) => {
             .item_click:hover {
                 text-decoration: underline;
                 cursor: pointer;
+            }
+            .item_folder, .item_text {
+                line-height: 29px;
+            }
+            .item_text {
+                height: 100%;
             }
             .item_icon {
                 display: none;
