@@ -166,7 +166,7 @@ const setBranch = (actionCwd) => {
 // Current git remote
 const setRemote = (actionCwd) => {
     exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = /^https?:\/\//.test(remote) ? remote.trim().replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '') : '';
+        curRemote = remote.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '');
     })
 };
 
@@ -180,7 +180,7 @@ const checkDirty = (actionCwd) => {
 // Check git left & right arrows status
 const checkArrows = (actionCwd) => {
     exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: actionCwd }, (err, arrows) => {
-        arrows = arrows.split("\t");
+        arrows = arrows.split('\t');
         pushArrow = arrows[0] > 0 ? arrows[0] : '';
         pullArrow = arrows[1] > 0 ? arrows[1] : '';
     })
