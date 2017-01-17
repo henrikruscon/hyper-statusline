@@ -90,7 +90,7 @@ module.exports = {
   config: {
     ...
       hyperStatusLine: {
-        fontFamily: 'Fira Code',
+        fontFamily: '"Fira Code"',
       }
     ...
   }
