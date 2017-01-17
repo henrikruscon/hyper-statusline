@@ -82,6 +82,21 @@ module.exports = {
 }
 ```
 
+### Change Font Family
+Default value is set to `-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif`
+
+```javascript
+module.exports = {
+  config: {
+    ...
+      hyperStatusLine: {
+        fontFamily: 'Fira Code',
+      }
+    ...
+  }
+}
+```
+
 
 ## Theme
 

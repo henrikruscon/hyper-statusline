@@ -10,6 +10,7 @@ exports.decorateConfig = (config) => {
         dirtyColor: config.colors.lightYellow,
         arrowsColor: config.colors.blue,
         fontSize: 12,
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif',
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -26,7 +27,7 @@ exports.decorateConfig = (config) => {
                 left: 0;
                 right: 0;
                 z-index: 100;
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+                font-family: ${hyperStatusLine.fontFamily};
                 font-size: ${hyperStatusLine.fontSize}px;
                 height: 30px;
                 padding: 0 14px 1px;
