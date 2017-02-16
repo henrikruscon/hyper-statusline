@@ -16,7 +16,7 @@ exports.decorateConfig = (config) => {
     return Object.assign({}, config, {
         css: `
             ${config.css || ''}
-            .terms_terms {
+            .l_main {
                 margin-bottom: 30px;
             }
             .footer_footer {
