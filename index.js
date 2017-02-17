@@ -152,7 +152,7 @@ const setCwd = (pid) => {
 
 // Current git branch
 const setBranch = (actionCwd) => {
-    exec(`git symbolic-ref --short HEAD`, { cwd: actionCwd }, (err, branch) => {
+    exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: actionCwd }, (err, branch) => {
         curBranch = branch;
 
         if (branch !== '') {
