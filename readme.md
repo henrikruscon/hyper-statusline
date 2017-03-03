@@ -20,10 +20,10 @@ module.exports = {
 
 ## Config
 
-Add following to `~/.hyper.js`.
+Add following to `~/.hyper.js`
 
 ### Change Git Dirty Color
-Expected value is `CSS colors`
+Expected value is `CSS color`
 
 ```javascript
 module.exports = {
@@ -38,7 +38,7 @@ module.exports = {
 ```
 
 ### Change Git Arrows Color
-Expected value is `CSS colors`
+Expected value is `CSS color`
 
 ```javascript
 module.exports = {
