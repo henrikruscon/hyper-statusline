@@ -22,7 +22,7 @@ exports.decorateConfig = (config) => {
             .footer_footer {
                 display: flex;
                 justify-content: space-between;
-                position: fixed;
+                position: absolute;
                 bottom: 0;
                 left: 0;
                 right: 0;
