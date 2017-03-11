@@ -258,7 +258,9 @@ exports.middleware = (store) => (next) => (action) => {
             break;
         case 'SESSION_ADD_DATA':
             const { data } = action;
-            if (data.charCodeAt(0) === 27) setCwd(curPid);
+            const enterKey = data.indexOf('\n') > 0;
+
+            if (enterKey) setCwd(curPid);
             break;
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid].pid;
