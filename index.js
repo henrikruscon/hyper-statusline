@@ -202,7 +202,7 @@ exports.decorateHyper = (Hyper, { React }) => {
         }
         handleClick(e) {
             if (e.target.classList.contains('item_folder')) shell.openExternal('file://'+this.state.folder);
-            else shell.openExternal(this.state.remote);
+            else shell.openExternal(this.state.remote+'/tree/'+this.state.branch);
         }
         render() {
             const hasFolder = this.state.folder ? ' item_active item_click' : '';
