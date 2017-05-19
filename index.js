@@ -201,8 +201,10 @@ exports.decorateHyper = (Hyper, { React }) => {
             this.handleClick = this.handleClick.bind(this);
         }
         handleClick(e) {
+            const tree = (this.state.remote.includes('bitbucket.org')) ? 'branch' : 'tree'
+            
             if (e.target.classList.contains('item_folder')) shell.openExternal('file://'+this.state.folder);
-            else shell.openExternal(`${this.state.remote}/tree/${this.state.branch}`);
+            else shell.openExternal(`${this.state.remote}/${tree}/${this.state.branch}`);
         }
         render() {
             const hasFolder = this.state.folder ? ' item_active item_click' : '';
