@@ -3,6 +3,10 @@ const { shell } = require('electron');
 const { exec } = require('child_process');
 const tildify = require('tildify');
 
+exports.getTermProps = function (uid, parentProps, props) {
+  return Object.assign(props, { uid });
+};
+
 // Config
 exports.decorateConfig = (config) => {
     const hyperStatusLine = Object.assign({
@@ -16,8 +20,8 @@ exports.decorateConfig = (config) => {
         css: `
             ${config.css || ''}
             .terms_terms {
-                margin-bottom: 30px;
-            }
+               margin-top: 14px;
+           }
             .footer_footer {
                 display: flex;
                 justify-content: space-between;
@@ -133,27 +137,40 @@ exports.decorateConfig = (config) => {
     })
 };
 
-let curPid;
-let curCwd;
-let curBranch;
-let curRemote;
-let repoDirty;
-let pushArrow;
-let pullArrow;
+let uidGitStatus = {};
+let curUid;
+const dirRegex = /\n([\w]:[\s\S]+)>/;
+
+const setWin32Cwd = (actionData) => {
+    // try to work out cwd from the action data using regex as lsof doesn't exist on win32
+    if (actionData && process.platform === 'win32' && dirRegex.test(actionData)) {
+        var curDir = dirRegex.exec(actionData)[1];
+        var newLineCounter = (curDir.match(/\n/g) || []).length;
+        if (newLineCounter === 0) {
+          uidGitStatus[curUid].cwd = curDir;
+        }
+    }
+};
 
 // Current shell cwd
-const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
-        curCwd = cwd.trim();
-        setBranch(curCwd);
-    })
+const setCwd = (actionData) => {
+  const pid = uidGitStatus[curUid].pid;
+    if (process.platform !== 'win32') {
+        exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
+            uidGitStatus[curUid].cwd = cwd.trim();
+        })
+  } else {
+    setWin32Cwd(actionData);
+  }
+  if (uidGitStatus[curUid].cwd) {
+    setBranch(uidGitStatus[curUid].cwd);
+  }
 };
 
 // Current git branch
 const setBranch = (actionCwd) => {
     exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: actionCwd }, (err, branch) => {
-        curBranch = branch;
-
+        uidGitStatus[curUid].branch = branch;
         if (branch !== '') {
             setRemote(actionCwd);
             checkDirty(actionCwd);
@@ -165,14 +182,14 @@ const setBranch = (actionCwd) => {
 // Current git remote
 const setRemote = (actionCwd) => {
     exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = remote.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '');
+        uidGitStatus[curUid].remote = remote.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '');
     })
 };
 
 // Check if repo is dirty
 const checkDirty = (actionCwd) => {
     exec(`git status --porcelain --ignore-submodules -unormal`, { cwd: actionCwd }, (err, dirty) => {
-        repoDirty = dirty;
+        uidGitStatus[curUid].dirty = dirty;
     })
 };
 
@@ -180,23 +197,23 @@ const checkDirty = (actionCwd) => {
 const checkArrows = (actionCwd) => {
     exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: actionCwd }, (err, arrows) => {
         arrows = arrows.split('\t');
-        pushArrow = arrows[0] > 0 ? arrows[0] : '';
-        pullArrow = arrows[1] > 0 ? arrows[1] : '';
+        uidGitStatus[curUid].pushArrow = arrows[0] > 0 ? arrows[0] : '';
+        uidGitStatus[curUid].pullArrow = arrows[1] > 0 ? arrows[1] : '';
     })
 };
 
 // Status line
-exports.decorateHyper = (Hyper, { React }) => {
+exports.decorateTerm = (Term, { React }) => {
     return class extends React.Component {
         constructor(props) {
             super(props);
             this.state = {
-                folder: curCwd,
-                branch: curBranch,
-                remote: curRemote,
-                dirty: repoDirty,
-                push: pushArrow,
-                pull: pullArrow,
+                folder: '~',
+                branch: '',
+                remote: '',
+                dirty: '',
+                push: '',
+                pull: '',
             }
             this.handleClick = this.handleClick.bind(this);
         }
@@ -213,7 +230,7 @@ exports.decorateHyper = (Hyper, { React }) => {
             const hasPull = this.state.pull ? ' icon_active' : '';
 
             return (
-                React.createElement(Hyper, Object.assign({}, this.props, {
+                React.createElement(Term, Object.assign({}, this.props, {
                     customChildren: React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
@@ -228,14 +245,16 @@ exports.decorateHyper = (Hyper, { React }) => {
         }
         componentDidMount() {
             this.interval = setInterval(() => {
+              if (uidGitStatus[this.props.uid]) {
                 this.setState({
-                    folder: curCwd,
-                    branch: curBranch,
-                    remote: curRemote,
-                    dirty: repoDirty,
-                    push: pushArrow,
-                    pull: pullArrow,
+                    folder: uidGitStatus[this.props.uid].cwd,
+                    branch: uidGitStatus[this.props.uid].branch,
+                    remote: uidGitStatus[this.props.uid].remote,
+                    dirty: uidGitStatus[this.props.uid].dirty,
+                    push: uidGitStatus[this.props.uid].pushArrow,
+                    pull: uidGitStatus[this.props.uid].pullArrow,
                 })
+              };
             }, 100)
         }
         componentWillUnmount() {
@@ -247,24 +266,30 @@ exports.decorateHyper = (Hyper, { React }) => {
 // Sessions
 exports.middleware = (store) => (next) => (action) => {
     const uids = store.getState().sessions.sessions;
-
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            curPid = uids[action.uid].pid;
+            curUid = action.uid;
+            if (uids[action.uid] && uids[action.uid].pid) {
+              uidGitStatus[curUid].pid = uids[action.uid].pid;
+            }
             break;
         case 'SESSION_ADD':
-            curPid = action.pid;
-            setCwd(curPid);
+            curUid = action.uid;
+            uidGitStatus[curUid] = {};
+            uidGitStatus[curUid].pid = action.pid;
+            setCwd(action.data);
             break;
         case 'SESSION_ADD_DATA':
             const { data } = action;
             const enterKey = data.indexOf('\n') > 0;
-
-            if (enterKey) setCwd(curPid);
+            if (enterKey) {
+                setCwd(action.data);
+            }
             break;
         case 'SESSION_SET_ACTIVE':
-            curPid = uids[action.uid].pid;
-            setCwd(curPid);
+            curUid = action.uid;
+            uidGitStatus[curUid].pid = uids[action.uid].pid;
+            setCwd(action.data);
             break;
     }
     next(action);
