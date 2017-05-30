@@ -20,6 +20,9 @@
     "hyper-statusline",
     "statusline"
   ],
+  "os": [
+    "!win32"
+  ],
   "dependencies": {
     "tildify": "^1.2.0"
   }
