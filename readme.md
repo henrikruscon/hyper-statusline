@@ -17,6 +17,8 @@ module.exports = {
 }
 ```
 
+**Note:** Currently doesn't support Windows
+
 
 ## Config
 
