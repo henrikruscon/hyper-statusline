@@ -187,7 +187,7 @@ const checkArrows = (actionCwd) => {
 
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
-    return class extends React.Component {
+    return class extends React.PureComponent {
         constructor(props) {
             super(props);
             this.state = {
