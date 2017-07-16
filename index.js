@@ -143,7 +143,7 @@ let pullArrow;
 
 // Current shell cwd
 const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
+    exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
         curCwd = cwd.trim();
         setBranch(curCwd);
     })
