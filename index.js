@@ -1,9 +1,7 @@
-// Require
 const { shell } = require('electron');
 const { exec } = require('child_process');
 const tildify = require('tildify');
 
-// Config
 exports.decorateConfig = (config) => {
     const configColors = Object.assign({
         black: '#000000',
@@ -21,14 +19,14 @@ exports.decorateConfig = (config) => {
         lightBlue: '#0066ff',
         lightMagenta: '#cc00ff',
         lightCyan: '#00ffff',
-        lightWhite: '#ffffff',
+        lightWhite: '#ffffff'
     }, config.colors);
 
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: configColors.lightYellow,
         arrowsColor: configColors.blue,
-        fontSize: 12,
+        fontSize: 12
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -149,7 +147,7 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-position: 0 8px;
             }
         `
-    })
+    });
 };
 
 let curPid;
@@ -204,11 +202,11 @@ const checkArrows = (actionCwd) => {
     })
 };
 
-// Status line
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.PureComponent {
         constructor(props) {
             super(props);
+
             this.state = {
                 folder: curCwd,
                 branch: curBranch,
@@ -217,12 +215,19 @@ exports.decorateHyper = (Hyper, { React }) => {
                 push: pushArrow,
                 pull: pullArrow,
             }
-            this.handleClick = this.handleClick.bind(this);
+
+            this.handleFolderClick = this.handleFolderClick.bind(this);
+            this.handleBranchClick = this.handleBranchClick.bind(this);
         }
-        handleClick(e) {
-            if (e.target.classList.contains('item_folder')) shell.openExternal('file://'+this.state.folder);
-            else shell.openExternal(this.state.remote);
+
+        handleFolderClick(e) {
+            shell.openExternal('file://'+this.state.folder);
         }
+
+        handleBranchClick(e) {
+            shell.openExternal(this.state.remote);
+        }
+
         render() {
             const hasFolder = this.state.folder ? ' item_active item_click' : '';
             const hasBranch = this.state.branch ? ' item_active' : '';
@@ -234,8 +239,8 @@ exports.decorateHyper = (Hyper, { React }) => {
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customInnerChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
-                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
+                        React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleFolderClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
+                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleBranchClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
                             React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` }),
                             React.createElement('i', { title: 'git-push', className: `item_icon icon_push${hasPush}` }),
@@ -245,6 +250,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                 }))
             )
         }
+
         componentDidMount() {
             this.interval = setInterval(() => {
                 this.setState({
@@ -257,13 +263,13 @@ exports.decorateHyper = (Hyper, { React }) => {
                 })
             }, 100)
         }
+
         componentWillUnmount() {
             clearInterval(this.interval)
         }
     };
 };
 
-// Sessions
 exports.middleware = (store) => (next) => (action) => {
     const uids = store.getState().sessions.sessions;
 
@@ -271,20 +277,24 @@ exports.middleware = (store) => (next) => (action) => {
         case 'SESSION_SET_XTERM_TITLE':
             curPid = uids[action.uid].pid;
             break;
+
         case 'SESSION_ADD':
             curPid = action.pid;
             setCwd(curPid);
             break;
+
         case 'SESSION_ADD_DATA':
             const { data } = action;
             const enterKey = data.indexOf('\n') > 0;
 
             if (enterKey) setCwd(curPid);
             break;
+
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid].pid;
             setCwd(curPid);
             break;
     }
+
     next(action);
 };
