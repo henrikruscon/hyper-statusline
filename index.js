@@ -155,6 +155,7 @@ exports.decorateConfig = (config) => {
 let curPid;
 let curCwd;
 let curBranch;
+let curBranchRemote;
 let curRemote;
 let repoDirty;
 let pushArrow;
@@ -171,9 +172,10 @@ const setCwd = (pid) => {
 // Current git branch
 const setBranch = (actionCwd) => {
     exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: actionCwd }, (err, branch) => {
-        curBranch = branch;
+        curBranch = branch.trim();
 
         if (branch !== '') {
+            setCurrentBranchRemote(actionCwd)
             setRemote(actionCwd);
             checkDirty(actionCwd);
             checkArrows(actionCwd);
@@ -181,9 +183,16 @@ const setBranch = (actionCwd) => {
     })
 };
 
+// Current git branch's remote name
+const setCurrentBranchRemote = (actionCwd) => {
+    exec(`git config --get branch.${curBranch}.remote`, { cwd: actionCwd }, (err, remote) => {
+        curBranchRemote = remote.trim();
+    })
+};
+
 // Current git remote
 const setRemote = (actionCwd) => {
-    exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
+    exec(`git config --get remote.${curBranchRemote}.url`, { cwd: actionCwd }, (err, remote) => {
         curRemote = remote.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '');
     })
 };
