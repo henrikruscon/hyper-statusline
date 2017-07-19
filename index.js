@@ -224,6 +224,10 @@ exports.decorateHyper = (Hyper, { React }) => {
             else shell.openExternal(this.state.remote);
         }
         render() {
+            const { customChildren } = this.props
+
+            const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
+
             const hasFolder = this.state.folder ? ' item_active item_click' : '';
             const hasBranch = this.state.branch ? ' item_active' : '';
             const hasRemote = this.state.remote ? ' item_click' : '';
@@ -233,7 +237,7 @@ exports.decorateHyper = (Hyper, { React }) => {
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
-                    customInnerChildren: React.createElement('footer', { className: 'footer_footer' },
+                    customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
@@ -241,7 +245,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                             React.createElement('i', { title: 'git-push', className: `item_icon icon_push${hasPush}` }),
                             React.createElement('i', { title: 'git-pull', className: `item_icon icon_pull${hasPull}` })
                         )
-                    )
+                    ))
                 }))
             )
         }
