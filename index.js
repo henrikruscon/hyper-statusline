@@ -188,7 +188,7 @@ const gitRemote = (repo, cb) => {
 
 const gitAhead = (repo, cb) => {
     exec(`git rev-list --left-only --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
-        cb(null, stdout);
+        cb(null, parseInt(stdout, 10));
     });
 }
 
