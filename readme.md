@@ -1,4 +1,4 @@
-# hyper-statusline [![hyper](https://img.shields.io/badge/Hyper-v1.3.0-green.svg)](https://github.com/zeit/hyper/releases/tag/1.3.0) [![npm](https://img.shields.io/npm/v/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline) [![npm](https://img.shields.io/npm/dt/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline)
+# hyper-statusline [![hyper](https://img.shields.io/badge/Hyper-v1.3.3-brightgreen.svg)](https://github.com/zeit/hyper/releases/tag/1.3.3) [![npm](https://img.shields.io/npm/v/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline) [![npm](https://img.shields.io/npm/dt/hyper-statusline.svg?maxAge=86400?style=flat-square)](https://www.npmjs.com/package/hyper-statusline)
 
 > Status Line Plugin for [Hyper](https://hyper.is). Shows clickable & useful information. Matches any theme.
 
@@ -16,6 +16,8 @@ module.exports = {
   ...
 }
 ```
+
+**Note:** Currently doesn't support Windows.
 
 
 ## Config

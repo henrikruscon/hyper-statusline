@@ -5,10 +5,29 @@ const tildify = require('tildify');
 
 // Config
 exports.decorateConfig = (config) => {
+    const configColors = Object.assign({
+        black: '#000000',
+        red: '#ff0000',
+        green: '#33ff00',
+        yellow: '#ffff00',
+        blue: '#0066ff',
+        magenta: '#cc00ff',
+        cyan: '#00ffff',
+        white: '#d0d0d0',
+        lightBlack: '#808080',
+        lightRed: '#ff0000',
+        lightGreen: '#33ff00',
+        lightYellow: '#ffff00',
+        lightBlue: '#0066ff',
+        lightMagenta: '#cc00ff',
+        lightCyan: '#00ffff',
+        lightWhite: '#ffffff',
+    }, config.colors);
+
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
-        dirtyColor: config.colors.lightYellow,
-        arrowsColor: config.colors.blue,
+        dirtyColor: configColors.lightYellow,
+        arrowsColor: configColors.blue,
         fontSize: 12,
     }, config.hyperStatusLine);
 
@@ -143,7 +162,7 @@ let pullArrow;
 
 // Current shell cwd
 const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | grep cwd | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
+    exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
         curCwd = cwd.trim();
         setBranch(curCwd);
     })
@@ -187,7 +206,7 @@ const checkArrows = (actionCwd) => {
 
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
-    return class extends React.Component {
+    return class extends React.PureComponent {
         constructor(props) {
             super(props);
             this.state = {
@@ -218,7 +237,7 @@ exports.decorateHyper = (Hyper, { React }) => {
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
-                    customChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
+                    customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),

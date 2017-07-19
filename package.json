@@ -1,6 +1,6 @@
 {
   "name": "hyper-statusline",
-  "version": "1.6.9",
+  "version": "1.6.10",
   "description": "Status Line Plugin for Hyper",
   "main": "index.js",
   "license": "MIT",
@@ -19,6 +19,9 @@
     "hyperterm-theme",
     "hyper-statusline",
     "statusline"
+  ],
+  "os": [
+    "!win32"
   ],
   "dependencies": {
     "tildify": "^1.2.0"
