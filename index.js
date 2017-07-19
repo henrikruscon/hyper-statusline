@@ -1,4 +1,6 @@
 // Require
+const { readFile, watchFile } = require('fs');
+const { resolve } = require('path');
 const { shell } = require('electron');
 const { exec } = require('child_process');
 const tildify = require('tildify');
@@ -148,6 +150,14 @@ exports.decorateConfig = (config) => {
                 transform: scaleY(-1);
                 -webkit-mask-position: 0 8px;
             }
+            .icon_now:before {
+              content: '▲';
+              background-color: transparent;
+              -webkit-mask: none;
+              left: -14px;
+              font-size: 14px;
+              line-height: 29px;
+            }
         `
     })
 };
@@ -159,6 +169,9 @@ let curRemote;
 let repoDirty;
 let pushArrow;
 let pullArrow;
+let nowName;
+let nowURL;
+const nowFile = resolve(process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'], '.now.json');
 
 // Current shell cwd
 const setCwd = (pid) => {
@@ -204,6 +217,38 @@ const checkArrows = (actionCwd) => {
     })
 };
 
+// Set current name and URL
+const setNow = () => {
+    readFile(nowFile, { encoding: 'utf8' }, (err, data) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+
+        try {
+            const nowConfig = JSON.parse(data);
+
+            if (nowConfig.currentTeam) {
+                nowName = nowConfig.currentTeam.name;
+                nowURL = `https://zeit.co/teams/${nowConfig.currentTeam.slug}`;
+            } else {
+                nowName = nowConfig.user.username;
+                nowURL = 'https://zeit.co/dashboard';
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
+}
+
+// watch nowFile for changes (now switch)
+// use fs.watch when process.versions.node is > 7
+watchFile(nowFile, { interval: 1000 }, (curr, prev) => {
+    if (curr.mtime > prev.mtime) {
+        setNow();
+    }
+});
+
 // Status line
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.PureComponent {
@@ -216,12 +261,19 @@ exports.decorateHyper = (Hyper, { React }) => {
                 dirty: repoDirty,
                 push: pushArrow,
                 pull: pullArrow,
+                nowName: nowName,
+                nowURL: nowURL,
             }
             this.handleClick = this.handleClick.bind(this);
         }
         handleClick(e) {
-            if (e.target.classList.contains('item_folder')) shell.openExternal('file://'+this.state.folder);
-            else shell.openExternal(this.state.remote);
+            if (e.target.classList.contains('item_folder')) {
+                shell.openExternal('file://'+this.state.folder);
+            } else if (e.target.classList.contains('icon_now')) {
+                shell.openExternal(this.state.nowURL);
+            } else {
+                shell.openExternal(this.state.remote);
+            }
         }
         render() {
             const { customChildren } = this.props
@@ -234,11 +286,13 @@ exports.decorateHyper = (Hyper, { React }) => {
             const isDirty = this.state.dirty ? ' icon_active' : '';
             const hasPush = this.state.push ? ' icon_active' : '';
             const hasPull = this.state.pull ? ' icon_active' : '';
+            const hasNow = this.state.nowName ? ' item_active item_click icon_now' : '';
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
+                        React.createElement('div', { title: this.state.nowURL, className: `item_item${hasNow}`, onClick: this.handleClick }, this.state.nowName),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
                             React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` }),
@@ -258,6 +312,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                     dirty: repoDirty,
                     push: pushArrow,
                     pull: pullArrow,
+                    nowName: nowName,
+                    nowURL: nowURL,
                 })
             }, 100)
         }
@@ -288,6 +344,9 @@ exports.middleware = (store) => (next) => (action) => {
         case 'SESSION_SET_ACTIVE':
             curPid = uids[action.uid].pid;
             setCwd(curPid);
+            break;
+        case 'INIT':
+            setNow();
             break;
     }
     next(action);
