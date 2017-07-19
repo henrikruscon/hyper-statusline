@@ -290,8 +290,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder item_active item_click`, onClick: this.handleFolderClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch ${this.state.branch ? 'item_active' : ''} ${this.state.remote ? 'item_click' : ''}`, onClick: this.handleBranchClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
-                            React.createElement('i', { title: 'Branch is ahead', className: `item_icon icon_ahead ${this.state.ahead ? 'icon_active' : ''}` }),
-                            React.createElement('i', { title: 'Branch is dirty', className: `item_icon icon_dirty ${this.state.dirty ? 'icon_active' : ''}` })
+                            React.createElement('i', { title: `${this.state.ahead} commits ahead`, className: `item_icon icon_ahead ${this.state.ahead ? 'icon_active' : ''}` }),
+                            React.createElement('i', { title: `${this.state.dirty} dirty ${this.state.dirty > 1 ? 'files' : 'file'}`, className: `item_icon icon_dirty ${this.state.dirty ? 'icon_active' : ''}` })
                         )
                     ))
                 }))
