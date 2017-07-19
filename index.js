@@ -1,5 +1,8 @@
 const { shell } = require('electron');
 const { exec } = require('child_process');
+const { stat } = require('fs');
+const path = require('path');
+const afterAll = require('after-all-results');
 const tildify = require('tildify');
 
 exports.decorateConfig = (config) => {
@@ -25,7 +28,7 @@ exports.decorateConfig = (config) => {
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: configColors.lightYellow,
-        arrowsColor: configColors.blue,
+        aheadColor: configColors.blue,
         fontSize: 12
     }, config.hyperStatusLine);
 
@@ -43,7 +46,6 @@ exports.decorateConfig = (config) => {
                 left: 0;
                 right: 0;
                 z-index: 100;
-                font-family: ${config.uiFontFamily || '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif'};
                 font-size: ${hyperStatusLine.fontSize}px;
                 height: 30px;
                 padding: 0 14px 1px;
@@ -138,69 +140,120 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMS4xNDI4NTcxLDAgTDAuODU3MTQyODU3LDAgQzAuMzg1NzE0Mjg2LDAgMCwwLjM4NTcxNDI4NiAwLDAuODU3MTQyODU3IEwwLDExLjE0Mjg1NzEgQzAsMTEuNjE0Mjg1NyAwLjM4NTcxNDI4NiwxMiAwLjg1NzE0Mjg1NywxMiBMMTEuMTQyODU3MSwxMiBDMTEuNjE0Mjg1NywxMiAxMiwxMS42MTQyODU3IDEyLDExLjE0Mjg1NzEgTDEyLDAuODU3MTQyODU3IEMxMiwwLjM4NTcxNDI4NiAxMS42MTQyODU3LDAgMTEuMTQyODU3MSwwIEwxMS4xNDI4NTcxLDAgWiBNMTEuMTQyODU3MSwxMS4xNDI4NTcxIEwwLjg1NzE0Mjg1NywxMS4xNDI4NTcxIEwwLjg1NzE0Mjg1NywwLjg1NzE0Mjg1NyBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMTEuMTQyODU3MSwxMS4xNDI4NTcxIEwxMS4xNDI4NTcxLDExLjE0Mjg1NzEgWiBNMy40Mjg1NzE0Myw2IEMzLjQyODU3MTQzLDQuNTc3MTQyODYgNC41NzcxNDI4NiwzLjQyODU3MTQzIDYsMy40Mjg1NzE0MyBDNy40MjI4NTcxNCwzLjQyODU3MTQzIDguNTcxNDI4NTcsNC41NzcxNDI4NiA4LjU3MTQyODU3LDYgQzguNTcxNDI4NTcsNy40MjI4NTcxNCA3LjQyMjg1NzE0LDguNTcxNDI4NTcgNiw4LjU3MTQyODU3IEM0LjU3NzE0Mjg2LDguNTcxNDI4NTcgMy40Mjg1NzE0Myw3LjQyMjg1NzE0IDMuNDI4NTcxNDMsNiBMMy40Mjg1NzE0Myw2IFoiLz48L3N2Zz4=');
                 background-color: ${hyperStatusLine.dirtyColor};
             }
-            .icon_push, .icon_pull {
+            .icon_ahead {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjE0Mjg1NzE0LDYuODU3MTQyODYgTDIuNTcxNDI4NTcsNi44NTcxNDI4NiBMMi41NzE0Mjg1Nyw1LjE0Mjg1NzE0IEw1LjE0Mjg1NzE0LDUuMTQyODU3MTQgTDUuMTQyODU3MTQsMi41NzE0Mjg1NyBMOS40Mjg1NzE0Myw2IEw1LjE0Mjg1NzE0LDkuNDI4NTcxNDMgTDUuMTQyODU3MTQsNi44NTcxNDI4NiBMNS4xNDI4NTcxNCw2Ljg1NzE0Mjg2IFogTTEyLDAuODU3MTQyODU3IEwxMiwxMS4xNDI4NTcxIEMxMiwxMS42MTQyODU3IDExLjYxNDI4NTcsMTIgMTEuMTQyODU3MSwxMiBMMC44NTcxNDI4NTcsMTIgQzAuMzg1NzE0Mjg2LDEyIDAsMTEuNjE0Mjg1NyAwLDExLjE0Mjg1NzEgTDAsMC44NTcxNDI4NTcgQzAsMC4zODU3MTQyODYgMC4zODU3MTQyODYsMCAwLjg1NzE0Mjg1NywwIEwxMS4xNDI4NTcxLDAgQzExLjYxNDI4NTcsMCAxMiwwLjM4NTcxNDI4NiAxMiwwLjg1NzE0Mjg1NyBMMTIsMC44NTcxNDI4NTcgWiBNMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMC44NTcxNDI4NTcsMC44NTcxNDI4NTcgTDAuODU3MTQyODU3LDExLjE0Mjg1NzEgTDExLjE0Mjg1NzEsMTEuMTQyODU3MSBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBaIiB0cmFuc2Zvcm09Im1hdHJpeCgwIC0xIC0xIDAgMTIgMTIpIi8+PC9zdmc+');
-                background-color: ${hyperStatusLine.arrowsColor};
-            }
-            .icon_pull {
-                transform: scaleY(-1);
-                -webkit-mask-position: 0 8px;
+                background-color: ${hyperStatusLine.aheadColor};
             }
         `
     });
 };
 
-let curPid;
-let curCwd;
-let curBranch;
-let curRemote;
-let repoDirty;
-let pushArrow;
-let pullArrow;
+let pid;
+let cwd;
+let git = {
+    branch: '',
+    remote: '',
+    ahead: 0,
+    dirty: 0
+}
 
-// Current shell cwd
 const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, cwd) => {
-        curCwd = cwd.trim();
-        setBranch(curCwd);
-    })
+    exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
+        cwd = stdout.trim();
+        setGit(cwd);
+    });
 };
 
-// Current git branch
-const setBranch = (actionCwd) => {
-    exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: actionCwd }, (err, branch) => {
-        curBranch = branch;
+const isGit = (dir, cb) => {
+    stat(path.join(dir, '.git'), (err) => {
+        cb(!err);
+    });
+}
 
-        if (branch !== '') {
-            setRemote(actionCwd);
-            checkDirty(actionCwd);
-            checkArrows(actionCwd);
+const gitBranch = (repo, cb) => {
+    exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: repo }, (err, stdout) => {
+        if (err) {
+            return cb(err);
         }
-    })
-};
 
-// Current git remote
-const setRemote = (actionCwd) => {
-    exec(`git config --get remote.origin.url`, { cwd: actionCwd }, (err, remote) => {
-        curRemote = remote.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, '');
-    })
-};
+        cb(null, stdout.trim());
+    });
+}
 
-// Check if repo is dirty
-const checkDirty = (actionCwd) => {
-    exec(`git status --porcelain --ignore-submodules -unormal`, { cwd: actionCwd }, (err, dirty) => {
-        repoDirty = dirty;
-    })
-};
+const gitRemote = (repo, cb) => {
+    exec(`git ls-remote --get-url`, { cwd: repo }, (err, stdout) => {
+        cb(null, stdout.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, ''));
+    });
+}
 
-// Check git left & right arrows status
-const checkArrows = (actionCwd) => {
-    exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: actionCwd }, (err, arrows) => {
-        arrows = arrows.split('\t');
-        pushArrow = arrows[0] > 0 ? arrows[0] : '';
-        pullArrow = arrows[1] > 0 ? arrows[1] : '';
-    })
-};
+const gitAhead = (repo, cb) => {
+    exec(`git rev-list --left-only --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
+        cb(null, stdout);
+    });
+}
+
+const gitDirty = (repo, cb) => {
+    exec(`git status --porcelain --ignore-submodules -unormal`, { cwd: repo }, (err, stdout) => {
+        if (err) {
+            return cb(err);
+        }
+
+        cb(null, !stdout ? 0 : parseInt(stdout.trim().split('\n').length, 10));
+    });
+}
+
+const gitCheck = (repo, cb) => {
+    const next = afterAll((err, results) => {
+        if (err) {
+            return cb(err);
+        }
+
+        const branch = results[0];
+        const remote = results[1];
+        const ahead = results[2];
+        const dirty = results[3];
+
+        cb(null, {
+            branch: branch,
+            remote: remote,
+            ahead: ahead,
+            dirty: dirty
+        });
+    });
+
+    gitBranch(repo, next());
+    gitRemote(repo, next());
+    gitAhead(repo, next());
+    gitDirty(repo, next());
+}
+
+const setGit = (repo) => {
+    isGit(repo, (exists) => {
+        if (!exists) {
+            git = {
+                branch: '',
+                remote: '',
+                ahead: 0,
+                dirty: 0
+            }
+
+            return;
+        }
+
+        gitCheck(repo, (err, result) => {
+            if (err) {
+                throw err;
+            }
+
+            git = {
+                branch: result.branch,
+                remote: result.remote,
+                ahead: result.ahead,
+                dirty: result.dirty
+            }
+        })
+    });
+}
 
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.PureComponent {
@@ -208,64 +261,57 @@ exports.decorateHyper = (Hyper, { React }) => {
             super(props);
 
             this.state = {
-                folder: curCwd,
-                branch: curBranch,
-                remote: curRemote,
-                dirty: repoDirty,
-                push: pushArrow,
-                pull: pullArrow,
+                folder: '',
+                branch: '',
+                remote: '',
+                ahead: 0,
+                dirty: 0
             }
 
             this.handleFolderClick = this.handleFolderClick.bind(this);
             this.handleBranchClick = this.handleBranchClick.bind(this);
         }
 
-        handleFolderClick(e) {
+        handleFolderClick(event) {
             shell.openExternal('file://'+this.state.folder);
         }
 
-        handleBranchClick(e) {
+        handleBranchClick(event) {
             shell.openExternal(this.state.remote);
         }
 
         render() {
-            const hasFolder = this.state.folder ? ' item_active item_click' : '';
-            const hasBranch = this.state.branch ? ' item_active' : '';
-            const hasRemote = this.state.remote ? ' item_click' : '';
-            const isDirty = this.state.dirty ? ' icon_active' : '';
-            const hasPush = this.state.push ? ' icon_active' : '';
-            const hasPull = this.state.pull ? ' icon_active' : '';
+            const { customChildren } = this.props
+            const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
-                    customInnerChildren: React.createElement('footer', { className: 'footer_footer' },
-                        React.createElement('div', { title: this.state.folder, className: `item_item item_folder${hasFolder}`, onClick: this.handleFolderClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
-                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch${hasBranch}${hasRemote}`, onClick: this.handleBranchClick },
+                    customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
+                        React.createElement('div', { title: this.state.folder, className: `item_item item_folder item_active item_click`, onClick: this.handleFolderClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
+                        React.createElement('div', { title: this.state.remote, className: `item_item item_branch ${this.state.branch ? 'item_active' : ''} ${this.state.remote ? 'item_click' : ''}`, onClick: this.handleBranchClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
-                            React.createElement('i', { title: 'git-dirty', className: `item_icon icon_dirty${isDirty}` }),
-                            React.createElement('i', { title: 'git-push', className: `item_icon icon_push${hasPush}` }),
-                            React.createElement('i', { title: 'git-pull', className: `item_icon icon_pull${hasPull}` })
+                            React.createElement('i', { title: 'Branch is ahead', className: `item_icon icon_ahead ${this.state.ahead ? 'icon_active' : ''}` }),
+                            React.createElement('i', { title: 'Branch is dirty', className: `item_icon icon_dirty ${this.state.dirty ? 'icon_active' : ''}` })
                         )
-                    )
+                    ))
                 }))
-            )
+            );
         }
 
         componentDidMount() {
             this.interval = setInterval(() => {
                 this.setState({
-                    folder: curCwd,
-                    branch: curBranch,
-                    remote: curRemote,
-                    dirty: repoDirty,
-                    push: pushArrow,
-                    pull: pullArrow,
-                })
-            }, 100)
+                    folder: cwd,
+                    branch: git.branch,
+                    remote: git.remote,
+                    ahead: git.ahead,
+                    dirty: git.dirty
+                });
+            }, 100);
         }
 
         componentWillUnmount() {
-            clearInterval(this.interval)
+            clearInterval(this.interval);
         }
     };
 };
@@ -275,24 +321,26 @@ exports.middleware = (store) => (next) => (action) => {
 
     switch (action.type) {
         case 'SESSION_SET_XTERM_TITLE':
-            curPid = uids[action.uid].pid;
+            pid = uids[action.uid].pid;
             break;
 
         case 'SESSION_ADD':
-            curPid = action.pid;
-            setCwd(curPid);
+            pid = action.pid;
+            setCwd(pid);
             break;
 
         case 'SESSION_ADD_DATA':
             const { data } = action;
             const enterKey = data.indexOf('\n') > 0;
 
-            if (enterKey) setCwd(curPid);
+            if (enterKey) {
+                setCwd(pid);
+            }
             break;
 
         case 'SESSION_SET_ACTIVE':
-            curPid = uids[action.uid].pid;
-            setCwd(curPid);
+            pid = uids[action.uid].pid;
+            setCwd(pid);
             break;
     }
 

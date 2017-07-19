@@ -39,7 +39,7 @@ module.exports = {
 }
 ```
 
-### Change Git Arrows Color
+### Change Git Ahead Color
 Expected value is `CSS color`
 
 ```javascript
@@ -47,7 +47,7 @@ module.exports = {
   config: {
     ...
       hyperStatusLine: {
-        arrowsColor: 'ivory',
+        aheadColor: 'ivory',
       }
     ...
   }
