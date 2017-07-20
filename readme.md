@@ -69,21 +69,6 @@ module.exports = {
 }
 ```
 
-### Change Font Size
-Default value is set to `12`
-
-```javascript
-module.exports = {
-  config: {
-    ...
-      hyperStatusLine: {
-        fontSize: 13,
-      }
-    ...
-  }
-}
-```
-
 
 ## Theme
 
