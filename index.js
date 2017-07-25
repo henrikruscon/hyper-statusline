@@ -165,8 +165,10 @@ const setCwd = (pid) => {
 };
 
 const isGit = (dir, cb) => {
-    stat(path.join(dir, '.git'), (err) => {
-        cb(!err);
+    exec(`git rev-parse --is-inside-work-tree`, (err, stdout) => {
+        if (err) {
+            return cb(err);
+        }
     });
 }
 
