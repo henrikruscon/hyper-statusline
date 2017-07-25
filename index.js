@@ -29,7 +29,8 @@ exports.decorateConfig = (config) => {
         footerTransparent: true,
         dirtyColor: configColors.lightYellow,
         aheadColor: configColors.blue,
-        fontSize: 12
+        fontSize: 12,
+        enableKubebertes: true
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -106,6 +107,14 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDE0IDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMywyIEw3LDIgTDcsMSBDNywwLjM0IDYuNjksMCA2LDAgTDEsMCBDMC40NSwwIDAsMC40NSAwLDEgTDAsMTEgQzAsMTEuNTUgMC40NSwxMiAxLDEyIEwxMywxMiBDMTMuNTUsMTIgMTQsMTEuNTUgMTQsMTEgTDE0LDMgQzE0LDIuNDUgMTMuNTUsMiAxMywyIEwxMywyIFogTTYsMiBMMSwyIEwxLDEgTDYsMSBMNiwyIEw2LDIgWiIvPjwvc3ZnPg==');
                 -webkit-mask-size: 14px 12px;
             }
+            .item_kube {
+                padding-left: 30px;
+            }
+            .item_kube:before {
+                left: 14.5px;
+                -webkit-mask-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAAAXNSR0IArs4c6QAAAAlwSFlzAAALEwAACxMBAJqcGAAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAAz5JREFUOBF1VE1MY1UUvue+14IDtQtTRhCatmOmkklMk1aaLgjgAtSxzCSEuNKM0eAom9loNCaTjCvNbCZEHMKE3SQsmEmkUJRVW4aE0J9knI2JARYNEaXRGMVYKPcez1fEzJj4Nvedc77vvHO+c+6jeDzuiUTqtLv7tNPS0sK1Ws0Gg0Ha39+32nf2GWbPLFFjwv7x8y8dHR26Wq1yIBDQh4eH1N39u9nZaWWNBPV6xN3Y2Pgrn8/XBeA1xriVSqVRyq/8RIof4oQNP+LAAQ8e+JRKpZ6CIzGYvqZJf1/MLa4qeZL9oy+yQ32W+bwm+oEMFzcfZB4h1jd0acSy7S3nl26B76IFBJDAWB6Lv/zqljp2rxpSz0oVZQkxK26zWn2YGBjdI4+ZMQ0ec7S9Dx74GhoMDg62NytwGl+Q8cyTUlvlQubNUCDzpSL244QNPzfceW3M58VcdhW8QKBmNUT0er3NaiTBe/LdOUV0Ljl0Ob6woIxS5OJMDl2MC+icVDfHjnMVVYB3cBAkx+/36/X19XpTA1Ij5bWlT3sivb8a5o+7glEfK0p3h15oGKYrrjazxfzyclco+lZPMLq9llvZBV9jjMgKEYlUeXxcOZu5ryvK8jfy5Qmy5gOreIJYfbuZy1YQB+5Y8OCBT4mBSxmMUQityCWt+OVwmSmmlX2/VFgqJfpf71PamRZ9vpPYMSn9GzNr0aguhJhMrzFRKmSuN8dI6sdwYHGynM+8S8xfWUVTSMCOnhKtbsMfDixNSqI94MEDX2MTURb2QGaZ+FdEUq9IC3eU1tNk1azswGunYgMHPHjgO7FYTNY+0gqRRLDUc6Fo2LLuh4ilwvJKVzialPHe6Ak/v20svYG4cL2ltczd4eHhNp/Px827cHR0JO1JNbJI0uM7YmyfiijuxonY2Yr4t6xSbwMHPHjt7VUmWZhW3IW+oYsjxjpjWKR/9qATU5DUndAALQhvj4yZsY7+xNH6HhYUfBe3EVmlhV5H0/1iIbsj5kfYG4xRBNYi4p/a8s3H7s493B3BrTb54+MXvOl0+gwS4cEqo9cTS6mXBkY/O32HH/FTGzzw6b//E9wFrPL//U+gQa325P/kbyCbzV9S3b3zAAAAAElFTkSuQmCC');
+                -webkit-mask-size: 12px 12px;
+            }
             .item_branch {
                 padding-left: 30px;
             }
@@ -156,17 +165,21 @@ let git = {
     ahead: 0,
     dirty: 0
 }
+let kube;
 
 const setCwd = (pid) => {
     exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
         cwd = stdout.trim();
         setGit(cwd);
+        setKube();
     });
 };
 
 const isGit = (dir, cb) => {
-    stat(path.join(dir, '.git'), (err) => {
-        cb(!err);
+    exec(`git rev-parse --is-inside-work-tree`, (err, stdout) => {
+        if (err) {
+            return cb(err);
+        }
     });
 }
 
@@ -255,6 +268,15 @@ const setGit = (repo) => {
     });
 }
 
+const setKube = (repo) => {
+    exec(`/usr/local/bin/kubectl config current-context`, (err, stdout) => {
+        console.log('KUBE', err, stdout)
+        if (!err) {
+            kube = stdout.trim();
+        }
+    });    
+}
+
 exports.decorateHyper = (Hyper, { React }) => {
     return class extends React.PureComponent {
         constructor(props) {
@@ -262,6 +284,7 @@ exports.decorateHyper = (Hyper, { React }) => {
 
             this.state = {
                 folder: '',
+                kube: '',
                 branch: '',
                 remote: '',
                 ahead: 0,
@@ -288,6 +311,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { title: this.state.folder, className: `item_item item_folder item_active item_click`, onClick: this.handleFolderClick }, this.state.folder ? tildify(String(this.state.folder)) : ''),
+                        React.createElement('div', { title: this.state.folder, className: `item_item item_kube ${this.state.kube ? 'item_active' : ''}`}, this.state.kube),
+
                         React.createElement('div', { title: this.state.remote, className: `item_item item_branch ${this.state.branch ? 'item_active' : ''} ${this.state.remote ? 'item_click' : ''}`, onClick: this.handleBranchClick },
                             React.createElement('span', { className: 'item_text' }, this.state.branch),
                             React.createElement('i', { title: `${this.state.ahead} commits ahead`, className: `item_icon icon_ahead ${this.state.ahead ? 'icon_active' : ''}` }),
@@ -302,6 +327,7 @@ exports.decorateHyper = (Hyper, { React }) => {
             this.interval = setInterval(() => {
                 this.setState({
                     folder: cwd,
+                    kube: kube,
                     branch: git.branch,
                     remote: git.remote,
                     ahead: git.ahead,
