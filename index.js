@@ -178,7 +178,7 @@ const gitRemote = (repo, cb) => {
 }
 
 const gitDirty = (repo, cb) => {
-    exec(`git status --porcelain --ignore-submodules -unormal`, { cwd: repo }, (err, stdout) => {
+    exec(`git status --porcelain --ignore-submodules -uno`, { cwd: repo }, (err, stdout) => {
         if (err) {
             return cb(err);
         }
