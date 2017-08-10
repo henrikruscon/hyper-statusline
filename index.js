@@ -7,8 +7,8 @@ const afterAll = require('after-all-results');
 const tildify = require('tildify');
 
 exports.decorateConfig = (config) => {
-    const colorForeground = color(config.foregroundColor);
-    const colorBackground = color(config.backgroundColor);
+    const colorForeground = color(config.foregroundColor || '#fff');
+    const colorBackground = color(config.backgroundColor || '#000');
     const colors = {
         foreground: colorForeground.string(),
         background: colorBackground.lighten(0.3).string()
@@ -55,7 +55,7 @@ exports.decorateConfig = (config) => {
                 z-index: 100;
                 font-size: 12px;
                 height: 30px;
-                background-color: ${colors.background || 'transparent'};
+                background-color: ${colors.background};
                 opacity: ${hyperStatusLine.footerTransparent ? '0.5' : '1'};
                 cursor: default;
                 -webkit-user-select: none;
@@ -66,7 +66,7 @@ exports.decorateConfig = (config) => {
             }
             .footer_footer .footer_group {
                 display: flex;
-                color: ${colors.foreground || 'white'};
+                color: ${colors.foreground};
                 white-space: nowrap;
                 margin: 0 14px;
             }
@@ -97,7 +97,7 @@ exports.decorateConfig = (config) => {
                 height: 100%;
                 -webkit-mask-repeat: no-repeat;
                 -webkit-mask-position: 0 center;
-                background-color: ${colors.foreground || 'white'};
+                background-color: ${colors.foreground};
             }
             .footer_footer .item_number {
                 font-size: 10.5px;
