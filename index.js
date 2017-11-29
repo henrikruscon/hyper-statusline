@@ -36,7 +36,6 @@ exports.decorateConfig = (config) => {
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: configColors.lightYellow,
-        aheadColor: configColors.blue
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -126,15 +125,6 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-size: 12px 12px;
                 background-color: ${hyperStatusLine.dirtyColor};
             }
-            .footer_footer .item_ahead {
-                color: ${hyperStatusLine.aheadColor};
-                padding-left: 16px;
-            }
-            .footer_footer .item_ahead:before {
-                -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjE0Mjg1NzE0LDYuODU3MTQyODYgTDIuNTcxNDI4NTcsNi44NTcxNDI4NiBMMi41NzE0Mjg1Nyw1LjE0Mjg1NzE0IEw1LjE0Mjg1NzE0LDUuMTQyODU3MTQgTDUuMTQyODU3MTQsMi41NzE0Mjg1NyBMOS40Mjg1NzE0Myw2IEw1LjE0Mjg1NzE0LDkuNDI4NTcxNDMgTDUuMTQyODU3MTQsNi44NTcxNDI4NiBMNS4xNDI4NTcxNCw2Ljg1NzE0Mjg2IFogTTEyLDAuODU3MTQyODU3IEwxMiwxMS4xNDI4NTcxIEMxMiwxMS42MTQyODU3IDExLjYxNDI4NTcsMTIgMTEuMTQyODU3MSwxMiBMMC44NTcxNDI4NTcsMTIgQzAuMzg1NzE0Mjg2LDEyIDAsMTEuNjE0Mjg1NyAwLDExLjE0Mjg1NzEgTDAsMC44NTcxNDI4NTcgQzAsMC4zODU3MTQyODYgMC4zODU3MTQyODYsMCAwLjg1NzE0Mjg1NywwIEwxMS4xNDI4NTcxLDAgQzExLjYxNDI4NTcsMCAxMiwwLjM4NTcxNDI4NiAxMiwwLjg1NzE0Mjg1NyBMMTIsMC44NTcxNDI4NTcgWiBNMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMC44NTcxNDI4NTcsMC44NTcxNDI4NTcgTDAuODU3MTQyODU3LDExLjE0Mjg1NzEgTDExLjE0Mjg1NzEsMTEuMTQyODU3MSBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBaIiB0cmFuc2Zvcm09Im1hdHJpeCgwIC0xIC0xIDAgMTIgMTIpIi8+PC9zdmc+');
-                -webkit-mask-size: 12px 12px;
-               background-color: ${hyperStatusLine.aheadColor};
-            }
         `
     });
 };
@@ -145,6 +135,7 @@ let git = {
     branch: '',
     remote: '',
     dirty: 0,
+    behind: 0,
     ahead: 0
 }
 
@@ -187,8 +178,14 @@ const gitDirty = (repo, cb) => {
     });
 }
 
+const gitBehind = (repo, cb) => {
+    exec(`git rev-list --right-only --count 'HEAD...@{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
+        cb(null, parseInt(stdout, 10));
+    });
+}
+
 const gitAhead = (repo, cb) => {
-    exec(`git rev-list --left-only --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
+    exec(`git rev-list --left-only --count 'HEAD...@{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
         cb(null, parseInt(stdout, 10));
     });
 }
@@ -202,12 +199,14 @@ const gitCheck = (repo, cb) => {
         const branch = results[0];
         const remote = results[1];
         const dirty = results[2];
-        const ahead = results[3];
+        const behind = results[3];
+        const ahead = results[4];
 
         cb(null, {
             branch: branch,
             remote: remote,
             dirty: dirty,
+            behind: behind,
             ahead: ahead
         });
     });
@@ -215,6 +214,7 @@ const gitCheck = (repo, cb) => {
     gitBranch(repo, next());
     gitRemote(repo, next());
     gitDirty(repo, next());
+    gitBehind(repo, next());
     gitAhead(repo, next());
 }
 
@@ -225,6 +225,7 @@ const setGit = (repo) => {
                 branch: '',
                 remote: '',
                 dirty: 0,
+                behind: 0,
                 ahead: 0
             }
 
@@ -240,6 +241,7 @@ const setGit = (repo) => {
                 branch: result.branch,
                 remote: result.remote,
                 dirty: result.dirty,
+                behind: result.behind,
                 ahead: result.ahead
             }
         })
@@ -256,6 +258,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                 branch: '',
                 remote: '',
                 dirty: 0,
+                behind: 0,
                 ahead: 0
             }
 
@@ -264,7 +267,7 @@ exports.decorateHyper = (Hyper, { React }) => {
         }
 
         handleCwdClick(event) {
-            shell.openExternal('file://'+this.state.cwd);
+            shell.openExternal('file://' + this.state.cwd);
         }
 
         handleBranchClick(event) {
@@ -287,7 +290,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                             React.createElement('div', { className: 'component_component component_git' },
                                 React.createElement('div', { className: `component_item item_icon item_branch ${this.state.remote ? 'item_clickable' : ''}`, title: this.state.remote, onClick: this.handleBranchClick, hidden: !this.state.branch }, this.state.branch),
                                 React.createElement('div', { className: 'component_item item_icon item_number item_dirty', title: `${this.state.dirty} dirty ${this.state.dirty > 1 ? 'files' : 'file'}`, hidden: !this.state.dirty }, this.state.dirty),
-                                React.createElement('div', { className: 'component_item item_icon item_number item_ahead', title: `${this.state.ahead} ${this.state.ahead > 1 ? 'commits' : 'commit'} ahead`, hidden: !this.state.ahead }, this.state.ahead)
+                                React.createElement('div', { className: 'component_item item_number item_behind', title: `${this.state.behind} ${this.state.behind > 1 ? 'commits' : 'commit'} behind`, hidden: !this.state.behind }, '↓' + this.state.behind),
+                                React.createElement('div', { className: 'component_item item_number item_ahead', title: `${this.state.ahead} ${this.state.ahead > 1 ? 'commits' : 'commit'} ahead`, hidden: !this.state.ahead }, '↑' + this.state.ahead)
                             )
                         )
                     ))
@@ -302,6 +306,7 @@ exports.decorateHyper = (Hyper, { React }) => {
                     branch: git.branch,
                     remote: git.remote,
                     dirty: git.dirty,
+                    behind: git.behind,
                     ahead: git.ahead
                 });
             }, 100);
