@@ -20,9 +20,6 @@
     "hyper-statusline",
     "statusline"
   ],
-  "os": [
-    "!win32"
-  ],
   "dependencies": {
     "after-all-results": "^2.0.0",
     "color": "^2.0.0",
