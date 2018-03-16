@@ -154,8 +154,10 @@ const setCwd = (pid, action) => {
         let directoryRegex = /([a-zA-Z]:[^\:\[\]\?\"\<\>\|]+)/mi;
         if (action && action.data) {
             let path = directoryRegex.exec(action.data);
-            cwd = path[0];
-            setGit(cwd);
+            if(path){
+                cwd = path[0];
+                setGit(cwd);
+            }
         }
     } else {
         exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
