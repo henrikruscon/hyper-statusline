@@ -149,11 +149,23 @@ let git = {
     ahead: 0
 }
 
-const setCwd = (pid) => {
-    exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
-        cwd = stdout.trim();
-        setGit(cwd);
-    });
+const setCwd = (pid, action) => {
+    if (process.platform == 'win32') {
+        let directoryRegex = /([a-zA-Z]:[^\:\[\]\?\"\<\>\|]+)/mi;
+        if (action && action.data) {
+            let path = directoryRegex.exec(action.data);
+            if(path){
+                cwd = path[0];
+                setGit(cwd);
+            }
+        }
+    } else {
+        exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
+            cwd = stdout.trim();
+            setGit(cwd);
+        });
+    }
+    
 };
 
 const isGit = (dir, cb) => {
@@ -332,7 +344,7 @@ exports.middleware = (store) => (next) => (action) => {
             const enterKey = data.indexOf('\n') > 0;
 
             if (enterKey) {
-                setCwd(pid);
+                setCwd(pid, action);
             }
             break;
 
