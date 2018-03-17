@@ -1,6 +1,6 @@
 {
   "name": "hyper-statusline",
-  "version": "1.7.4",
+  "version": "1.7.5",
   "description": "Status Line Plugin for Hyper",
   "main": "index.js",
   "license": "MIT",
