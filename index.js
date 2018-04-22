@@ -217,10 +217,10 @@ const gitCheck = (repo, cb) => {
         const ahead = results[3];
 
         cb(null, {
-            branch: branch,
-            remote: remote,
-            dirty: dirty,
-            ahead: ahead
+            branch,
+            remote,
+            dirty,
+            ahead
         });
     });
 
@@ -248,12 +248,7 @@ const setGit = (repo) => {
                 throw err;
             }
 
-            git = {
-                branch: result.branch,
-                remote: result.remote,
-                dirty: result.dirty,
-                ahead: result.ahead
-            }
+            git = result
         })
     });
 }
@@ -309,13 +304,7 @@ exports.decorateHyper = (Hyper, { React }) => {
 
         componentDidMount() {
             this.interval = setInterval(() => {
-                this.setState({
-                    cwd: cwd,
-                    branch: git.branch,
-                    remote: git.remote,
-                    dirty: git.dirty,
-                    ahead: git.ahead
-                });
+                this.setState(Object.assign({ cwd }, git));
             }, 100);
         }
 
