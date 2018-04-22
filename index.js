@@ -34,7 +34,7 @@ exports.decorateConfig = (config) => {
     const hyperStatusLine = Object.assign({
         footerTransparent: true,
         dirtyColor: configColors.lightYellow,
-        aheadColor: configColors.blue
+        aheadBehindColor: configColors.blue
     }, config.hyperStatusLine);
 
     return Object.assign({}, config, {
@@ -124,14 +124,19 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-size: 12px 12px;
                 background-color: ${hyperStatusLine.dirtyColor};
             }
-            .footer_footer .item_ahead {
-                color: ${hyperStatusLine.aheadColor};
+            .footer_footer .item_ahead,
+            .footer_footer .item_behind {
+                color: ${hyperStatusLine.aheadBehindColor};
                 padding-left: 16px;
             }
-            .footer_footer .item_ahead:before {
+            .footer_footer .item_ahead:before,
+            .footer_footer .item_behind:before {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDEyIDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik01LjE0Mjg1NzE0LDYuODU3MTQyODYgTDIuNTcxNDI4NTcsNi44NTcxNDI4NiBMMi41NzE0Mjg1Nyw1LjE0Mjg1NzE0IEw1LjE0Mjg1NzE0LDUuMTQyODU3MTQgTDUuMTQyODU3MTQsMi41NzE0Mjg1NyBMOS40Mjg1NzE0Myw2IEw1LjE0Mjg1NzE0LDkuNDI4NTcxNDMgTDUuMTQyODU3MTQsNi44NTcxNDI4NiBMNS4xNDI4NTcxNCw2Ljg1NzE0Mjg2IFogTTEyLDAuODU3MTQyODU3IEwxMiwxMS4xNDI4NTcxIEMxMiwxMS42MTQyODU3IDExLjYxNDI4NTcsMTIgMTEuMTQyODU3MSwxMiBMMC44NTcxNDI4NTcsMTIgQzAuMzg1NzE0Mjg2LDEyIDAsMTEuNjE0Mjg1NyAwLDExLjE0Mjg1NzEgTDAsMC44NTcxNDI4NTcgQzAsMC4zODU3MTQyODYgMC4zODU3MTQyODYsMCAwLjg1NzE0Mjg1NywwIEwxMS4xNDI4NTcxLDAgQzExLjYxNDI4NTcsMCAxMiwwLjM4NTcxNDI4NiAxMiwwLjg1NzE0Mjg1NyBMMTIsMC44NTcxNDI4NTcgWiBNMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMC44NTcxNDI4NTcsMC44NTcxNDI4NTcgTDAuODU3MTQyODU3LDExLjE0Mjg1NzEgTDExLjE0Mjg1NzEsMTEuMTQyODU3MSBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBMMTEuMTQyODU3MSwwLjg1NzE0Mjg1NyBaIiB0cmFuc2Zvcm09Im1hdHJpeCgwIC0xIC0xIDAgMTIgMTIpIi8+PC9zdmc+');
                 -webkit-mask-size: 12px 12px;
                 background-color: currentColor;
+            }
+            .footer_footer .item_behind:before {
+                transform: rotate(180deg);
             }
             .notifications_view {
                 bottom: 50px;
@@ -298,7 +303,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                             React.createElement('div', { className: 'component_component component_git' },
                                 React.createElement('div', { className: `component_item item_icon item_branch ${this.state.remote ? 'item_clickable' : ''}`, title: this.state.remote, onClick: this.handleBranchClick, hidden: !this.state.branch }, this.state.branch),
                                 React.createElement('div', { className: 'component_item item_icon item_number item_dirty', title: `${this.state.dirty} dirty ${this.state.dirty !== 1 ? 'files' : 'file'}`, hidden: !this.state.dirty }, this.state.dirty),
-                                React.createElement('div', { className: 'component_item item_icon item_number item_ahead', title: `${this.state.ahead} ${this.state.ahead !== 1 ? 'commits' : 'commit'} ahead`, hidden: !this.state.ahead }, this.state.ahead)
+                                React.createElement('div', { className: 'component_item item_icon item_number item_ahead', title: `${this.state.ahead} ${this.state.ahead !== 1 ? 'commits' : 'commit'} ahead`, hidden: !this.state.ahead }, this.state.ahead),
+                                React.createElement('div', { className: 'component_item item_icon item_number item_behind', title: `${this.state.behind} ${this.state.behind !== 1 ? 'commits' : 'commit'} behind`, hidden: !this.state.behind }, this.state.behind)
                             )
                         )
                     ))
