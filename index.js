@@ -165,7 +165,6 @@ const setCwd = (pid, action) => {
             setGit(cwd);
         });
     }
-    
 };
 
 const isGit = (dir, cb) => {
