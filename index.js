@@ -146,7 +146,8 @@ let git = {
     branch: '',
     remote: '',
     dirty: 0,
-    ahead: 0
+    ahead: 0,
+    behind: 0
 }
 
 const setCwd = (pid, action) => {
@@ -199,11 +200,11 @@ const gitDirty = (repo, cb) => {
     });
 }
 
-const gitAhead = (repo, cb) => {
-    exec(`git rev-list --left-only --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
-        cb(null, parseInt(stdout, 10));
+const gitAheadBehind = (repo, cb) => {
+    exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
+        cb(null, stdout.split('\t').map(n => parseInt(n, 10)));
     });
-}
+};
 
 const gitCheck = (repo, cb) => {
     const next = afterAll((err, results) => {
@@ -214,20 +215,21 @@ const gitCheck = (repo, cb) => {
         const branch = results[0];
         const remote = results[1];
         const dirty = results[2];
-        const ahead = results[3];
+        const [ahead, behind] = results[3];
 
         cb(null, {
             branch,
             remote,
             dirty,
-            ahead
+            ahead,
+            behind
         });
     });
 
     gitBranch(repo, next());
     gitRemote(repo, next());
     gitDirty(repo, next());
-    gitAhead(repo, next());
+    gitAheadBehind(repo, next());
 }
 
 const setGit = (repo) => {
@@ -237,7 +239,8 @@ const setGit = (repo) => {
                 branch: '',
                 remote: '',
                 dirty: 0,
-                ahead: 0
+                ahead: 0,
+                behind: 0
             }
 
             return;
@@ -263,7 +266,8 @@ exports.decorateHyper = (Hyper, { React }) => {
                 branch: '',
                 remote: '',
                 dirty: 0,
-                ahead: 0
+                ahead: 0,
+                behind: 0,
             }
 
             this.handleCwdClick = this.handleCwdClick.bind(this);
