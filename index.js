@@ -212,29 +212,30 @@ const gitAheadBehind = (repo, cb) => {
 };
 
 const gitCheck = (repo, cb) => {
-    const next = afterAll((err, results) => {
+    let failed = false;
+    const send = (key) => (err, results) => {
+        if (failed) {
+          return;
+        }
         if (err) {
+            failed = true;
             return cb(err);
         }
 
-        const branch = results[0];
-        const remote = results[1];
-        const dirty = results[2];
-        const [ahead, behind] = results[3];
+        let reply
+        if (typeof key === 'string') {
+            reply = { [key]: results }
+        } else {
+            reply = key(results)
+        }
 
-        cb(null, {
-            branch,
-            remote,
-            dirty,
-            ahead,
-            behind
-        });
-    });
+        cb(null, reply);
+    };
 
-    gitBranch(repo, next());
-    gitRemote(repo, next());
-    gitDirty(repo, next());
-    gitAheadBehind(repo, next());
+    gitBranch(repo, send('branch'));
+    gitRemote(repo, send('remote'));
+    gitDirty(repo, send('dirty'));
+    gitAheadBehind(repo, send(([ahead, behind]) => ({ ahead, behind })));
 }
 
 const setGit = (repo) => {
@@ -256,8 +257,8 @@ const setGit = (repo) => {
                 throw err;
             }
 
-            git = result
-        })
+            Object.assign(git, result);
+        });
     });
 }
 
