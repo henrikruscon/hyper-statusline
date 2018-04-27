@@ -281,6 +281,23 @@ exports.decorateHyper = (Hyper, { React }) => {
             shell.openExternal(this.state.remote);
         }
 
+        /**
+         * @param key   key for `this.state` and `className`
+         * @param title `{pl foo}` prints `foo` for 1 and `foos` for 2.
+         *              `{pl foo, bar}` prints `foo` for 1 and `bar` for 2.
+         */
+        Counter(key, title) {
+            const n = this.state[key];
+            return React.createElement('div', {
+                className: 'component_item item_icon item_number item_' + key,
+                title: `${n} ${title.replace(
+                    /\{pl ([^}]+)(?:, ([^}]+))\}/,
+                    (_, singular, plural) => n !== 1 ? plural || singular + 's' : singular
+                )}`,
+                hidden: !n
+            }, n);
+        }
+
         render() {
             const { customChildren } = this.props
             const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
@@ -296,9 +313,9 @@ exports.decorateHyper = (Hyper, { React }) => {
                         React.createElement('div', { className: 'footer_group' },
                             React.createElement('div', { className: 'component_component component_git' },
                                 React.createElement('div', { className: `component_item item_icon item_branch ${this.state.remote ? 'item_clickable' : ''}`, title: this.state.remote, onClick: this.handleBranchClick, hidden: !this.state.branch }, this.state.branch),
-                                React.createElement('div', { className: 'component_item item_icon item_number item_dirty', title: `${this.state.dirty} dirty ${this.state.dirty !== 1 ? 'files' : 'file'}`, hidden: !this.state.dirty }, this.state.dirty),
-                                React.createElement('div', { className: 'component_item item_icon item_number item_ahead', title: `${this.state.ahead} ${this.state.ahead !== 1 ? 'commits' : 'commit'} ahead`, hidden: !this.state.ahead }, this.state.ahead),
-                                React.createElement('div', { className: 'component_item item_icon item_number item_behind', title: `${this.state.behind} ${this.state.behind !== 1 ? 'commits' : 'commit'} behind`, hidden: !this.state.behind }, this.state.behind)
+                                this.Counter('dirty', 'dirty {pl file}'),
+                                this.Counter('ahead', '{pl commit} ahead'),
+                                this.Counter('behind', '{pl commit} behind'),
                             )
                         )
                     ))
