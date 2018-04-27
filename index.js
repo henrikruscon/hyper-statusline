@@ -267,14 +267,7 @@ exports.decorateHyper = (Hyper, { React }) => {
         constructor(props) {
             super(props);
 
-            this.state = {
-                cwd: '',
-                branch: '',
-                remote: '',
-                dirty: 0,
-                ahead: 0,
-                behind: 0,
-            }
+            this.state = Object.assign({ cwd: '' }, git);
 
             this.handleCwdClick = this.handleCwdClick.bind(this);
             this.handleBranchClick = this.handleBranchClick.bind(this);
