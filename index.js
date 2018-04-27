@@ -196,12 +196,12 @@ const gitRemote = (repo, cb) => {
 }
 
 const gitDirty = (repo, cb) => {
-    exec(`git status --porcelain --ignore-submodules -uno`, { cwd: repo }, (err, stdout) => {
+    exec(`git status --porcelain --ignore-submodules -uno | wc -l`, { cwd: repo }, (err, stdout) => {
         if (err) {
             return cb(err);
         }
 
-        cb(null, !stdout ? 0 : parseInt(stdout.trim().split('\n').length, 10));
+        cb(null, !stdout ? 0 : parseInt(stdout.trim(), 10));
     });
 }
 
