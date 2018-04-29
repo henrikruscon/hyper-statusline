@@ -239,6 +239,10 @@ const gitStashes = (repo, cb) => {
 
 const gitAheadBehind = (repo, cb) => {
     exec(`git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null`, { cwd: repo }, (err, stdout) => {
+        if (err) {
+            return cb(err);
+        }
+
         cb(null, stdout.split('\t').map(n => parseInt(n, 10)));
     });
 };
