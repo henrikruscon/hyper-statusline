@@ -254,14 +254,7 @@ const gitCheck = (repo, cb) => {
             return cb(err);
         }
 
-        let reply
-        if (typeof key === 'string') {
-            reply = { [key]: results }
-        } else {
-            reply = key(results)
-        }
-
-        cb(null, reply);
+        cb(null, typeof key === 'string' ? { [key]: results } : key(results));
     };
 
     gitBranch(repo, send('branch'));
