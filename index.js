@@ -327,7 +327,7 @@ exports.decorateHyper = (Hyper, { React }) => {
             return React.createElement('div', {
                 className: 'component_item item_icon item_number item_' + key,
                 title: `${n} ${title.replace(
-                    /\{pl ([^}]+)(?:, ([^}]+))\}/,
+                    /\{pl ([^,}]+)(?:,\s*([^}]+))?\}/g,
                     (_, singular, plural) => n !== 1 ? plural || singular + 's' : singular
                 )}`,
                 hidden: !n
