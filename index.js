@@ -1,5 +1,6 @@
 const { shell } = require('electron');
 const { exec } = require('child_process');
+const path = require('path');
 const color = require('color');
 const afterAll = require('after-all-results');
 const tildify = require('tildify');
@@ -337,12 +338,23 @@ exports.decorateHyper = (Hyper, { React }) => {
             const { customChildren } = this.props
             const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
 
+            let friendlyCwd = this.state.cwd ? tildify(String(this.state.cwd)) : '';
+            if (friendlyCwd) {
+                friendlyCwd = React.createElement("span", null,
+                    path.dirname(friendlyCwd),
+                    path.sep,
+                    React.createElement("strong", null,
+                        path.basename(friendlyCwd)
+                    )
+                );
+            }
+
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
                     customInnerChildren: existingChildren.concat(React.createElement('footer', { className: 'footer_footer' },
                         React.createElement('div', { className: 'footer_group group_overflow' },
                             React.createElement('div', { className: 'component_component component_cwd' },
-                                React.createElement('div', { className: 'component_item item_icon item_cwd item_clickable', title: this.state.cwd, onClick: this.handleCwdClick, hidden: !this.state.cwd }, this.state.cwd ? tildify(String(this.state.cwd)) : '')
+                                React.createElement('div', { className: 'component_item item_icon item_cwd item_clickable', title: this.state.cwd, onClick: this.handleCwdClick, hidden: !this.state.cwd }, friendlyCwd)
                             )
                         ),
                         React.createElement('div', { className: 'footer_group' },
