@@ -165,7 +165,7 @@ let git = {
     behind: 0,
     new: 0,
     stashes: 0
-}
+};
 
 const setCwd = (pid, action) => {
     if (process.platform == 'win32') {
@@ -189,7 +189,7 @@ const isGit = (dir, cb) => {
     exec(`git rev-parse --is-inside-work-tree`, { cwd: dir }, (err) => {
         cb(!err);
     });
-}
+};
 
 const gitBranch = (repo, cb) => {
     exec(`git symbolic-ref --short HEAD || git rev-parse --short HEAD`, { cwd: repo }, (err, stdout) => {
@@ -199,13 +199,13 @@ const gitBranch = (repo, cb) => {
 
         cb(null, stdout.trim());
     });
-}
+};
 
 const gitRemote = (repo, cb) => {
     exec(`git ls-remote --get-url`, { cwd: repo }, (err, stdout) => {
         cb(null, stdout.trim().replace(/^git@(.*?):/, 'https://$1/').replace(/[A-z0-9\-]+@/, '').replace(/\.git$/, ''));
     });
-}
+};
 
 const gitDirty = (repo, cb) => {
     exec(`git status --porcelain --ignore-submodules -uno | wc -l`, { cwd: repo }, (err, stdout) => {
@@ -215,7 +215,7 @@ const gitDirty = (repo, cb) => {
 
         cb(null, !stdout ? 0 : parseInt(stdout.trim(), 10));
     });
-}
+};
 
 const gitNew = (repo, cb) => {
     exec(`git status --porcelain --ignore-submodules | grep -E '^(\\?\\?|A ) ' | wc -l`, { cwd: repo }, (err, stdout) => {
@@ -276,7 +276,7 @@ const setGit = (repo) => {
                 ahead: 0,
                 behind: 0,
                 stashes: 0
-            }
+            };
 
             return;
         }
@@ -328,7 +328,7 @@ exports.decorateHyper = (Hyper, { React }) => {
         }
 
         render() {
-            const { customChildren } = this.props
+            const { customChildren } = this.props;
             const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
 
             let friendlyCwd = this.state.cwd ? tildify(String(this.state.cwd)) : '';
