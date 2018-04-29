@@ -246,11 +246,7 @@ const gitAheadBehind = (repo, cb) => {
 const gitCheck = (repo, cb) => {
     let failed = false;
     const send = (key) => (err, results) => {
-        if (failed) {
-          return;
-        }
         if (err) {
-            failed = true;
             return cb(err);
         }
 
