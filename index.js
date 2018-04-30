@@ -114,6 +114,9 @@ exports.decorateConfig = (config) => {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxMiIgdmlld0JveD0iMCAwIDE0IDEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xMywyIEw3LDIgTDcsMSBDNywwLjM0IDYuNjksMCA2LDAgTDEsMCBDMC40NSwwIDAsMC40NSAwLDEgTDAsMTEgQzAsMTEuNTUgMC40NSwxMiAxLDEyIEwxMywxMiBDMTMuNTUsMTIgMTQsMTEuNTUgMTQsMTEgTDE0LDMgQzE0LDIuNDUgMTMuNTUsMiAxMywyIEwxMywyIFogTTYsMiBMMSwyIEwxLDEgTDYsMSBMNiwyIEw2LDIgWiIvPjwvc3ZnPg==');
                 -webkit-mask-size: 14px 12px;
             }
+            .footer_footer .item_stashes {
+                color: ${hyperStatusLine.stashesColor};
+            }
             .footer_footer .item_stashes:before {
                 -webkit-mask-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDEyIDE2Ij48cGF0aCBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik02IDE1Yy0zLjMxIDAtNi0uOS02LTJ2LTJjMC0uMTcuMDktLjM0LjIxLS41LjY3Ljg2IDMgMS41IDUuNzkgMS41czUuMTItLjY0IDUuNzktMS41Yy4xMy4xNi4yMS4zMy4yMS41djJjMCAxLjEtMi42OSAyLTYgMnptMC00Yy0zLjMxIDAtNi0uOS02LTJWN2MwLS4xMS4wNC0uMjEuMDktLjMxLjAzLS4wNi4wNy0uMTMuMTItLjE5Qy44OCA3LjM2IDMuMjEgOCA2IDhzNS4xMi0uNjQgNS43OS0xLjVjLjA1LjA2LjA5LjEzLjEyLjE5LjA1LjEuMDkuMjEuMDkuMzF2MmMwIDEuMS0yLjY5IDItNiAyem0wLTRjLTMuMzEgMC02LS45LTYtMlY0IDNjMC0xLjEgMi42OS0yIDYtMnM2IC45IDYgMnYyYzAgMS4xLTIuNjkgMi02IDJ6bTAtNWMtMi4yMSAwLTQgLjQ1LTQgMXMxLjc5IDEgNCAxIDQtLjQ1IDQtMS0xLjc5LTEtNC0xeiIvPjwvc3ZnPg==');
                 -webkit-mask-size: 12px 16px;
