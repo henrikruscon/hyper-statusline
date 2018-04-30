@@ -266,7 +266,7 @@ const gitCheck = (repo, cb) => {
     gitNew(repo, send('new'));
     gitStashes(repo, send('stashes'));
     gitAheadBehind(repo, send(([ahead, behind]) => ({ ahead, behind })));
-}
+};
 
 const setGit = (repo) => {
     isGit(repo, (exists) => {
