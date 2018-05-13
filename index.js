@@ -285,8 +285,8 @@ exports.decorateHyper = (Hyper, { React }) => {
         }
 
         render() {
-            const { customChildren } = this.props
-            const existingChildren = customChildren ? customChildren instanceof Array ? customChildren : [customChildren] : [];
+            const { customInnerChildren } = this.props
+            const existingChildren = customInnerChildren ? customInnerChildren instanceof Array ? customInnerChildren : [customInnerChildren] : [];
 
             return (
                 React.createElement(Hyper, Object.assign({}, this.props, {
