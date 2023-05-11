@@ -160,7 +160,7 @@ const setCwd = (pid, action) => {
             }
         }
     } else {
-        exec(`lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
+        exec(`LANG=en_US.UTF-8 lsof -p ${pid} | awk '$4=="cwd"' | tr -s ' ' | cut -d ' ' -f9-`, (err, stdout) => {
             cwd = stdout.trim();
             setGit(cwd);
         });
